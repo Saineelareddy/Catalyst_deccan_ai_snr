@@ -64,6 +64,8 @@ class Settings(BaseSettings):
             key = get_sec(f"GEMINI_API_KEY{i}")
             if key and key not in self.gemini_api_keys:
                 self.gemini_api_keys.append(key)
+        
+        print(f"📡 KEY_DISCOVERY: Found {len(self.gemini_api_keys)} Gemini keys.")
                 
         # Collect Groq keys
         self.groq_api_keys = []
@@ -76,6 +78,8 @@ class Settings(BaseSettings):
             key = get_sec(f"GROQ_API_KEY{i}")
             if key and key not in self.groq_api_keys:
                 self.groq_api_keys.append(key)
+        
+        print(f"📡 KEY_DISCOVERY: Found {len(self.groq_api_keys)} Groq keys.")
 
         if not self.gemini_api_keys and not self.groq_api_keys:
             print("⚠️ WARNING: No API keys found in Environment or Streamlit Secrets!")

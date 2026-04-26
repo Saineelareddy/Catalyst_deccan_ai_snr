@@ -25,6 +25,13 @@ class KeyManager:
 
         logger.info(f"KeyManager initialized: {len(self.keys['gemini'])} Gemini keys, {len(self.keys['groq'])} Groq keys.")
 
+    def refresh_keys(self, provider: str):
+        """Reloads keys from settings if they are missing."""
+        if provider == "gemini":
+            self.keys["gemini"] = [{"key": k, "last_used": 0, "cooldown_until": 0, "failures": 0} for k in settings.gemini_api_keys]
+        elif provider == "groq":
+            self.keys["groq"] = [{"key": k, "last_used": 0, "cooldown_until": 0, "failures": 0} for k in settings.groq_api_keys]
+
     def get_best_keys(self, provider: str, count: int = 3) -> List[str]:
         """
         Returns the N best available keys for a provider, sorted by least recently used.
@@ -33,6 +40,10 @@ class KeyManager:
         if provider not in self.keys:
             return []
             
+        # Try a quick refresh if empty
+        if not self.keys[provider]:
+            self.refresh_keys(provider)
+
         now = time.time()
         available = [k for k in self.keys[provider] if k["cooldown_until"] <= now]
         
