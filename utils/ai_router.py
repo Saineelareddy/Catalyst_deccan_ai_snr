@@ -80,40 +80,68 @@ class AIRouter:
 
                 logger.info(f"[{provider}] Attempt {attempt+1}/{max_attempts}: Racing {len(keys)} keys...")
 
-                tasks = [
-                    asyncio.create_task(
-                        self._execute_with_key(client, prompt, system_prompt, key, provider)
-                    ) for key in keys
-                ]
+                try:
+                    key, response_text = await self._race_keys(
+                        client, prompt, system_prompt, keys, provider
+                    )
+                    key_manager.report_success(provider, key)
+                    if cache_key and not bypass_cache:
+                        set_cached_response(cache_key, response_text)
+                    if response_model:
+                        return parse_structured_response(response_text, response_model)
+                    return response_text
+                except Exception as e:
+                    last_exception = e
+                    logger.warning(f"[{provider}] Attempt {attempt+1} failed: {str(e)[:120]}")
 
-                pending = set(tasks)
-                while pending:
-                    done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
-                    for task in done:
-                        try:
-                            key, response_text = task.result()
-                            for t in pending:
-                                t.cancel()
-                            key_manager.report_success(provider, key)
-                            if cache_key and not bypass_cache:
-                                set_cached_response(cache_key, response_text)
-                            if response_model:
-                                return parse_structured_response(response_text, response_model)
-                            return response_text
-                        except Exception as e:
-                            logger.warning(f"[{provider}] Key failed: {str(e)[:120]}")
-                            last_exception = e
-
-                logger.warning(f"[{provider}] All keys in attempt {attempt+1} failed.")
-
-            if not succeeded:
-                logger.error(f"[{provider}] ALL {max_attempts} attempts failed. Moving to next provider...")
+            logger.error(f"[{provider}] ALL {max_attempts} attempts failed. Moving to next provider...")
 
         # All providers exhausted
         raise RuntimeError(
             f"ALL PROVIDERS EXHAUSTED. Last error: {last_exception}. "
             "Check your API keys and rate limits."
         )
+
+    async def _race_keys(self, client, prompt, system_prompt, keys, provider):
+        """
+        Race a batch of API keys in parallel.
+        Returns (key, response_text) on first success, or raises the last exception.
+        Properly cleans up cancelled tasks to prevent CancelledError propagation.
+        """
+        tasks = {
+            asyncio.create_task(
+                self._execute_with_key(client, prompt, system_prompt, key, provider),
+                name=f"{provider}-{key[:8]}"
+            ): key for key in keys
+        }
+
+        last_exception = None
+        pending = set(tasks.keys())
+
+        try:
+            while pending:
+                done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
+                for task in done:
+                    exc = task.exception() if not task.cancelled() else None
+                    if exc is None and not task.cancelled():
+                        # ✅ SUCCESS — cancel remaining and clean up safely
+                        for t in pending:
+                            t.cancel()
+                        if pending:
+                            await asyncio.gather(*pending, return_exceptions=True)
+                        return task.result()
+                    else:
+                        last_exception = exc or Exception("Task was cancelled")
+                        logger.warning(f"[{provider}] Key failed: {str(last_exception)[:120]}")
+        except asyncio.CancelledError:
+            # If we ourselves get cancelled, clean up children first
+            for t in pending:
+                t.cancel()
+            if pending:
+                await asyncio.gather(*pending, return_exceptions=True)
+            raise
+
+        raise last_exception or Exception(f"All {len(keys)} keys failed for {provider}")
 
     async def _execute_with_key(self, client, prompt, system_prompt, key, provider):
         """Helper to execute and report to key manager."""
