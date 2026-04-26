@@ -1,31 +1,22 @@
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import Literal
+from typing import Literal, List, Optional
 
 class Settings(BaseSettings):
     """
     Application configuration settings.
-    Loads from environment variables or a .env file.
+    Loads from environment variables, .env file, or Streamlit Secrets (lazy-loaded).
     """
-    # AI Provider configuration
     ai_provider: Literal["gemini", "groq"] = "gemini"
-    
-    # API Keys (collected as lists for rotation)
-    gemini_api_keys: list[str] = []
-    groq_api_keys: list[str] = []
-    
-    # Primary keys (fallback for legacy code)
-    gemini_api_key: str | None = None
-    groq_api_key: str | None = None
-    
-    # Default Models
+    gemini_api_keys: List[str] = []
+    groq_api_keys: List[str] = []
+    gemini_api_key: Optional[str] = None
+    groq_api_key: Optional[str] = None
     gemini_model: str = "gemini-2.5-flash"
     groq_model: str = "llama-3.3-70b-versatile"
-    
-    # Cache settings
     cache_dir: str = ".cache"
-    cache_expiration_seconds: int = 86400  # 24 hours
-    
+    cache_expiration_seconds: int = 86400
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -34,60 +25,93 @@ class Settings(BaseSettings):
 
     def __init__(self, **values):
         super().__init__(**values)
-        import os
-        from dotenv import load_dotenv
-        load_dotenv() 
-        
-        # Streamlit Secrets Support
-        st_secrets = {}
+        self._load_all_keys()
+
+    def _get_secrets(self) -> dict:
+        """Try to get Streamlit secrets dict. Returns {} if not available yet."""
         try:
             import streamlit as st
-            st_secrets = st.secrets
-        except:
-            pass
+            # Access .secrets — on Cloud this is always ready during a script run
+            return dict(st.secrets)
+        except Exception:
+            return {}
 
-        def get_sec(key, default=None):
-            # Try Streamlit Secrets first, then OS Env
-            val = st_secrets.get(key)
-            if val is not None: return val
-            return os.getenv(key, default)
+    def _get(self, key: str, secrets: dict) -> Optional[str]:
+        """Read a key from Streamlit Secrets first, then OS environment."""
+        val = secrets.get(key)
+        if val:
+            return str(val).strip()
+        return os.getenv(key, "").strip() or None
 
-        # Collect Gemini keys
+    def _load_all_keys(self):
+        """
+        Collects all API keys from every supported secret format:
+        Format 1 (numbered):   GEMINI_API_KEY, GEMINI_API_KEY1 ... GEMINI_API_KEY30
+        Format 2 (list/csv):   GEMINI_API_KEYS = "key1, key2, key3"
+        """
+        from dotenv import load_dotenv
+        load_dotenv()
+
+        secrets = self._get_secrets()
+
+        # ── GEMINI ──────────────────────────────────────────────────
         self.gemini_api_keys = []
-        # Check primary key
-        pk = get_sec("GEMINI_API_KEY")
-        if pk: 
-            self.gemini_api_key = pk
-            self.gemini_api_keys.append(pk)
-        
-        for i in range(1, 30): # Check up to 30 keys
-            key = get_sec(f"GEMINI_API_KEY{i}")
-            if key and key not in self.gemini_api_keys:
-                self.gemini_api_keys.append(key)
-        
-        print(f"📡 KEY_DISCOVERY: Found {len(self.gemini_api_keys)} Gemini keys.")
-                
-        # Collect Groq keys
+
+        # Format 2: comma-separated list in one secret
+        csv = self._get("GEMINI_API_KEYS", secrets)
+        if csv:
+            for k in csv.split(","):
+                k = k.strip()
+                if k and k not in self.gemini_api_keys:
+                    self.gemini_api_keys.append(k)
+
+        # Format 1: individual numbered keys
+        for suffix in ["", *[str(i) for i in range(1, 31)]]:
+            k = self._get(f"GEMINI_API_KEY{suffix}", secrets)
+            if k and k not in self.gemini_api_keys:
+                self.gemini_api_keys.append(k)
+
+        # Set primary key alias
+        if self.gemini_api_keys:
+            self.gemini_api_key = self.gemini_api_keys[0]
+
+        # ── GROQ ────────────────────────────────────────────────────
         self.groq_api_keys = []
-        pk_groq = get_sec("GROQ_API_KEY")
-        if pk_groq:
-            self.groq_api_key = pk_groq
-            self.groq_api_keys.append(pk_groq)
-            
-        for i in range(1, 20):
-            key = get_sec(f"GROQ_API_KEY{i}")
-            if key and key not in self.groq_api_keys:
-                self.groq_api_keys.append(key)
-        
-        print(f"📡 KEY_DISCOVERY: Found {len(self.groq_api_keys)} Groq keys.")
 
+        csv = self._get("GROQ_API_KEYS", secrets)
+        if csv:
+            for k in csv.split(","):
+                k = k.strip()
+                if k and k not in self.groq_api_keys:
+                    self.groq_api_keys.append(k)
+
+        for suffix in ["", *[str(i) for i in range(1, 21)]]:
+            k = self._get(f"GROQ_API_KEY{suffix}", secrets)
+            if k and k not in self.groq_api_keys:
+                self.groq_api_keys.append(k)
+
+        if self.groq_api_keys:
+            self.groq_api_key = self.groq_api_keys[0]
+
+        # ── AI Provider override ────────────────────────────────────
+        prov = self._get("AI_PROVIDER", secrets)
+        if prov in ("gemini", "groq"):
+            self.ai_provider = prov
+
+        # ── Model overrides ─────────────────────────────────────────
+        gm = self._get("GEMINI_MODEL", secrets)
+        if gm: self.gemini_model = gm
+        gq = self._get("GROQ_MODEL", secrets)
+        if gq: self.groq_model = gq
+
+        print(f"📡 KEY_DISCOVERY: {len(self.gemini_api_keys)} Gemini keys | {len(self.groq_api_keys)} Groq keys | Provider: {self.ai_provider}")
         if not self.gemini_api_keys and not self.groq_api_keys:
-            print("⚠️ WARNING: No API keys found in Environment or Streamlit Secrets!")
+            print("⚠️  WARNING: No API keys found! Check Streamlit Secrets or your .env file.")
 
-# Global settings instance
+    def refresh(self):
+        """Re-load all keys at runtime (call after Streamlit context is ready)."""
+        self._load_all_keys()
+
+
+# Global settings singleton
 settings = Settings()
-
-# Ensure we have the necessary API keys depending on the provider
-if settings.ai_provider == "gemini" and not settings.gemini_api_key:
-    # We warn rather than raise immediately, as they might provide it in runtime
-    pass

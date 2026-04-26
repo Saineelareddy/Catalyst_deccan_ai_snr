@@ -18,6 +18,17 @@ from ui.dashboard import render_results_dashboard
 from ui.processing import render_processing_screen
 from datetime import datetime
 
+# ── CRITICAL: Refresh secrets inside the Streamlit context ──────────────────
+# The Settings singleton is created at import time (before st.secrets is ready).
+# We refresh here so all keys from Streamlit Cloud secrets are loaded.
+from config.settings import settings
+from utils.key_manager import key_manager
+
+settings.refresh()                          # Re-read st.secrets now that we're live
+key_manager.refresh_keys("gemini")         # Push fresh keys into the rotation engine
+key_manager.refresh_keys("groq")
+# ────────────────────────────────────────────────────────────────────────────
+
 # Load custom CSS
 def local_css(file_name):
     with open(file_name) as f:

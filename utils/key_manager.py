@@ -26,11 +26,13 @@ class KeyManager:
         logger.info(f"KeyManager initialized: {len(self.keys['gemini'])} Gemini keys, {len(self.keys['groq'])} Groq keys.")
 
     def refresh_keys(self, provider: str):
-        """Reloads keys from settings if they are missing."""
+        """Reloads keys from settings (re-reads Streamlit Secrets if needed)."""
+        settings.refresh()  # Re-load from secrets/env at runtime
         if provider == "gemini":
             self.keys["gemini"] = [{"key": k, "last_used": 0, "cooldown_until": 0, "failures": 0} for k in settings.gemini_api_keys]
         elif provider == "groq":
             self.keys["groq"] = [{"key": k, "last_used": 0, "cooldown_until": 0, "failures": 0} for k in settings.groq_api_keys]
+        logger.info(f"KeyManager refreshed: {len(self.keys.get(provider, []))} {provider} keys loaded.")
 
     def get_best_keys(self, provider: str, count: int = 3) -> List[str]:
         """
@@ -40,8 +42,9 @@ class KeyManager:
         if provider not in self.keys:
             return []
             
-        # Try a quick refresh if empty
+        # Try a refresh if empty — handles Streamlit Cloud lazy-secret loading
         if not self.keys[provider]:
+            logger.warning(f"No keys for '{provider}'. Attempting runtime refresh from secrets...")
             self.refresh_keys(provider)
 
         now = time.time()
