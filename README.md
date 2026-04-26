@@ -1,4 +1,4 @@
-# 🧠 NeuralHire — AI-Powered Skill Assessment & Personalized Learning Engine
+# AI-Powered Skill Assessment & Personalized Learning Engine
 
 > **"Don't just screen candidates. Understand them."**
 > NeuralHire is a production-grade, multi-agent AI system that conducts real technical interviews, scores candidates with evidence-based reasoning, and generates week-by-week personalized learning roadmaps — all in minutes.
