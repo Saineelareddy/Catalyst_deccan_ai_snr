@@ -283,31 +283,23 @@ graph LR
 
 ---
 
-## ðŸ§ª Demo / Screenshots
+### 🖼️ Demo & Walkthrough
 
-> **Step 1 â€” Document Setup**
-> Upload a Job Description and Resume (PDF or paste text). The system accepts both formats without configuration.
+#### 1. Document Setup
+Upload a Job Description and Resume (PDF or paste text). The system accepts both formats without configuration and performs instant skill extraction.
 
-![Setup Screen](assets/setup_screen.png)
+#### 2. Live Adaptive Interview
+Technical questions are generated and streamed in real-time. The AI analyzes prior responses to adapt difficulty dynamically, ensuring a deep technical probe.
 
-> **Step 2 — Live Adaptive Interview**
-> Questions are streamed in real-time. The AI reads prior answers and adapts the next question's difficulty accordingly.
-
-![Interview Screen](assets/interview_screen.png)
-
-> **Step 3 â€” Results Dashboard**
-> Skill-by-skill breakdown with scores, confidence levels, and AI reasoning. Includes behavioral analysis.
-
-![Dashboard Screen](assets/dashboard_screen.png)
-
-> **Step 3 — Learning Roadmap**
-> Week-by-week roadmap per skill gap. Includes curated documentation links, 3-tier YouTube library, and buildable milestone projects.
-
-![Roadmap Screen](assets/roadmap_screen.png)
+#### 3. Results & Mastery Roadmap
+A comprehensive dashboard showing:
+- **Skill-by-Skill Analysis**: Evidence-based scores with AI reasoning.
+- **Behavioral Insights**: Assessment of communication clarity and confidence.
+- **AI Mastery Roadmap**: A personalized, week-by-week learning plan with curated resources.
 
 ---
 
-## ðŸ› ï¸ Installation & Setup
+## 🛠️ Installation & Setup
 
 ### Prerequisites
 
@@ -378,48 +370,20 @@ python main.py
 
 ---
 
-## ðŸ“‚ Project Structure
+## 📂 Project Structure
 
-```
-deccan/
-â”œâ”€â”€ agents/                        # Specialized AI Agents
-â”‚   â”œâ”€â”€ parser_agent.py            # Resume + JD â†’ ParsedDocument (Pydantic)
-â”‚   â”œâ”€â”€ skill_extractor.py         # JD â†’ Weighted ExtractedSkill list
-â”‚   â”œâ”€â”€ assessment_agent.py        # Adaptive question generator + async stream
-â”‚   â”œâ”€â”€ scoring_agent.py           # Evidence-based 1-10 skill scorer
-â”‚   â”œâ”€â”€ behavioral_agent.py        # Soft-skill evaluator (clarity, confidence)
-â”‚   â”œâ”€â”€ gap_analysis_agent.py      # Deterministic gap prioritization math
-â”‚   â”œâ”€â”€ learning_plan_agent.py     # Week-by-week roadmap generator
-â”‚   â””â”€â”€ vision_evaluator.py        # Screen-share / frame analysis (experimental)
-â”‚
-â”œâ”€â”€ utils/                         # Core Infrastructure
-â”‚   â”œâ”€â”€ ai_router.py               # âš¡ Central AI orchestration (parallel racing)
-â”‚   â”œâ”€â”€ ai_client.py               # GeminiClient + GroqClient (async ABC)
-â”‚   â”œâ”€â”€ key_manager.py             # Multi-key health tracking + rotation
-â”‚   â”œâ”€â”€ ai_cache.py                # Disk-based 24hr response cache
-â”‚   â”œâ”€â”€ ai_structured.py           # JSON schema prompts + Pydantic parsing
-â”‚   â”œâ”€â”€ ai_observability.py        # Logging + tracing hooks
-â”‚   â”œâ”€â”€ ai_retry.py                # Tenacity retry decorators
-â”‚   â”œâ”€â”€ document_parser.py         # PyMuPDF PDF text extraction
-â”‚   â”œâ”€â”€ audio_parser.py            # Audio input parser (experimental)
-â”‚   â”œâ”€â”€ live_stream_manager.py     # WebSocket live stream manager
-â”‚   â””â”€â”€ webhook_notifier.py        # Async webhook notifications
-â”‚
-â”œâ”€â”€ ui/                            # Streamlit Frontend
-â”‚   â”œâ”€â”€ app.py                     # Main app router + session state machine
-â”‚   â”œâ”€â”€ dashboard.py               # Results + gap analysis visualization
-â”‚   â”œâ”€â”€ processing.py              # Loading/processing overlay screens
-│   └── style.css                  # Cyber Dark theme + glassmorphism CSS
-â”‚
-â”œâ”€â”€ config/
-â”‚   â””â”€â”€ settings.py                # pydantic-settings config (env + Streamlit Secrets)
-â”‚
-â”œâ”€â”€ api/                           # FastAPI REST layer (programmatic access)
-â”œâ”€â”€ main.py                        # CLI pipeline demo entry point
-â”œâ”€â”€ requirements.txt               # Python dependencies
-â”œâ”€â”€ Dockerfile                     # python:3.12-slim + libmupdf-dev
-â”œâ”€â”€ docker-compose.yml             # Multi-service orchestration
-â””â”€â”€ .env                           # API keys (never commit this)
+```text
+.
+├── agents/                  # Specialized AI Agents (Assessor, Scorer, Planner)
+├── api/                     # FastAPI REST endpoint layer
+├── config/                  # Configuration & Environment management
+├── ui/                      # Streamlit Frontend (App, Dashboard, Styles)
+├── utils/                   # Core Infrastructure (AIRouter, KeyManager, Caching)
+├── Dockerfile               # Production container configuration
+├── docker-compose.yml       # Multi-service orchestration
+├── main.py                  # CLI pipeline demonstration entry point
+├── requirements.txt         # Project dependencies
+└── .env                     # Local environment secrets (ignored by git)
 ```
 
 ---
