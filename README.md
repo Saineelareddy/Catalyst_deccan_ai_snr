@@ -11,6 +11,7 @@
 ![Groq](https://img.shields.io/badge/Groq_LLaMA_3.3_70B-Fallback_AI-F55036?style=for-the-badge)
 ![Pydantic](https://img.shields.io/badge/Pydantic_v2-Schema_Validation-E92063?style=for-the-badge)
 ![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Production_Ready-brightgreen?style=for-the-badge)
 
 ---
@@ -284,7 +285,7 @@ graph LR
 
 ## ðŸ§ª Demo / Screenshots
 
-> **Step 1 — Document Setup**
+> **Step 1 â€” Document Setup**
 > Upload a Job Description and Resume (PDF or paste text). The system accepts both formats without configuration.
 
 ![Setup Screen](assets/setup_screen.png)
@@ -294,13 +295,13 @@ graph LR
 
 ![Interview Screen](assets/interview_screen.png)
 
-> **Step 3 — Results Dashboard**
+> **Step 3 â€” Results Dashboard**
 > Skill-by-skill breakdown with scores, confidence levels, and AI reasoning. Includes behavioral analysis.
 
 ![Dashboard Screen](assets/dashboard_screen.png)
 
-> **Step 4 — Personalized Learning Roadmap**
-> Week-by-week roadmap per skill gap. Includes curated documentation links, 3-tier video library, and buildable milestone projects.
+> **Step 3 — Learning Roadmap**
+> Week-by-week roadmap per skill gap. Includes curated documentation links, 3-tier YouTube library, and buildable milestone projects.
 
 ![Roadmap Screen](assets/roadmap_screen.png)
 
@@ -552,4 +553,40 @@ class YourNewAgent:
 ```
 
 The `ai_router` handles all complexity: key selection, parallel racing, caching, and structured output parsing.
+
+---
+
+## ðŸ“œ License
+
+This project is licensed under the **MIT License**.
+
+```
+MIT License
+
+Copyright (c) 2026 AI Skill Assessment Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+```
+
+---
+
+<div align="center">
+
+**Built with â¤ï¸ by the AI Skill Assessment Team**
+
+*Powered by Gemini 2.5 Flash Â· Groq LLaMA 3.3 Â· Pydantic v2 Â· Streamlit*
+
+</div>
 
