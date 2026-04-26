@@ -1,12 +1,12 @@
-from typing import List, Dict
+from typing import List, Dict, Optional, Any
 from pydantic import BaseModel, Field
 from utils.ai_router import ai_router
 
 class SkillScore(BaseModel):
-    skill: str = Field(description="The name of the skill being evaluated.")
-    score: int = Field(description="The evaluated proficiency score from 1-10.", ge=1, le=10)
-    confidence: float = Field(description="Confidence in this score from 0.0 to 1.0.", ge=0.0, le=1.0)
-    reasoning: str = Field(description="Detailed reasoning for the score based on the candidate's answers and rubric.")
+    skill: Optional[Any] = None
+    score: Optional[Any] = 0
+    confidence: Optional[Any] = 0.5
+    reasoning: Optional[Any] = ""
 
 class ScoringAgent:
     """

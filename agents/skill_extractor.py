@@ -1,15 +1,15 @@
-from typing import List
+from typing import List, Optional, Any, Dict
 from pydantic import BaseModel, Field
 from utils.ai_router import ai_router
 
 class ExtractedSkill(BaseModel):
-    skill_name: str = Field(description="The name of the skill")
-    required_proficiency: int = Field(description="Required proficiency level from 1 (beginner) to 10 (expert)", ge=1, le=10)
-    importance_weight: int = Field(description="Importance weight from 1 (nice to have) to 5 (critical)", ge=1, le=5)
-    context: str = Field(description="Brief context of why this skill is needed based on the JD")
+    skill_name: Optional[Any] = None
+    required_proficiency: Optional[Any] = 5
+    importance_weight: Optional[Any] = 3
+    context: Optional[Any] = ""
 
 class JDSkillsExtraction(BaseModel):
-    skills: List[ExtractedSkill]
+    skills: List[Dict[str, Any]] = Field(default=[])
 
 class SkillExtractorAgent:
     """

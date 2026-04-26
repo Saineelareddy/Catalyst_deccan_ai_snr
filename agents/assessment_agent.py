@@ -1,11 +1,11 @@
-from typing import List, Dict
+from typing import List, Dict, Optional, Any
 from pydantic import BaseModel, Field
 from utils.ai_router import ai_router
 
 class AssessmentQuestion(BaseModel):
-    question: str = Field(description="The interview question to ask the candidate.")
-    expected_key_points: List[str] = Field(description="Key points expected in a strong answer.")
-    difficulty: int = Field(description="Difficulty level of the question on a scale of 1-10.")
+    question: Optional[Any] = None
+    expected_key_points: List[Any] = Field(default=[])
+    difficulty: Optional[Any] = 5
 
 class AssessmentAgent:
     """

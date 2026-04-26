@@ -1,4 +1,4 @@
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Dict
 from pydantic import BaseModel, Field
 from utils.ai_router import ai_router
 
@@ -24,9 +24,9 @@ class EducationItem(BaseModel):
 class ParsedDocument(BaseModel):
     name: Optional[Any] = Field(None)
     skills: List[Any] = Field(default=[])
-    experience: List[ExperienceItem] = Field(default=[])
-    projects: List[ProjectItem] = Field(default=[])
-    education: List[EducationItem] = Field(default=[])
+    experience: List[Dict[str, Any]] = Field(default=[])
+    projects: List[Dict[str, Any]] = Field(default=[])
+    education: List[Dict[str, Any]] = Field(default=[])
 
 class ParserAgent:
     """
