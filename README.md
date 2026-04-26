@@ -11,7 +11,6 @@
 ![Groq](https://img.shields.io/badge/Groq_LLaMA_3.3_70B-Fallback_AI-F55036?style=for-the-badge)
 ![Pydantic](https://img.shields.io/badge/Pydantic_v2-Schema_Validation-E92063?style=for-the-badge)
 ![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Production_Ready-brightgreen?style=for-the-badge)
 
 ---
