@@ -95,12 +95,18 @@ class AIRouter:
                         return parse_structured_response(resp, response_model)
                     return resp
 
+                except asyncio.CancelledError:
+                    # Re-raise immediately — this means Streamlit is shutting down the script
+                    # DO NOT try next key, the entire context is being torn down
+                    logger.warning(f"[{provider}] Request was cancelled (Streamlit rerun). Aborting.")
+                    raise
+
                 except Exception as e:
                     err_str = str(e)
                     key_manager.report_failure(provider, key, err_str)
                     last_exception = e
                     logger.warning(f"[{provider}] Key {key[:8]}... failed: {err_str[:100]}")
-                    # Continue to next key immediately
+                    # Continue to next key
 
             logger.error(f"[{provider}] All keys exhausted.")
 
