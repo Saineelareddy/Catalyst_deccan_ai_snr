@@ -45,17 +45,17 @@ flowchart TD
     end
 
     subgraph Core_Intelligence ["🧠 Agent Core"]
-        Parser[ParserAgent: Resume/JD Extraction]
-        Extractor[SkillExtractorAgent: Weighted Requirements]
-        Assessor[AssessmentAgent: Question Generation]
-        Scorer[ScoringAgent: 1-10 Rubric Scoring]
-        Planner[LearningPlanAgent: Roadmap Generation]
+        Parser[ParserAgent]
+        Extractor[SkillExtractorAgent]
+        Assessor[AssessmentAgent]
+        Scorer[ScoringAgent]
+        Planner[LearningPlanAgent]
     end
 
     subgraph Orchestration ["⚡ AI Engine"]
-        Router[AIRouter: Parallel Key Racing]
-        Manager[KeyManager: Health & Rotation]
-        Cache[AICache: 24hr TTL Persistence]
+        Router[AIRouter]
+        Manager[KeyManager]
+        Cache[AICache]
     end
 
     Upload --> Parser
@@ -64,11 +64,16 @@ flowchart TD
     Extractor --> Assessor
     Assessor --> Scorer
     Scorer --> Planner
-    Chat <--> Assessor
-    Dashboard <-- Scorer
-    Dashboard <-- Planner
+    Chat --> Assessor
+    Assessor --> Chat
+    Scorer --> Dashboard
+    Planner --> Dashboard
 
-    Parser & Extractor & Assessor & Scorer & Planner --> Router
+    Parser --> Router
+    Extractor --> Router
+    Assessor --> Router
+    Scorer --> Router
+    Planner --> Router
     Router --> Manager
     Router --> Cache
 ```
