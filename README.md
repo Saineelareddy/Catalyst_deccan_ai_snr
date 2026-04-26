@@ -1,29 +1,18 @@
 # AI Skill Assessment Agent — Personalized Learning Engine
 
 > **"Don't just screen candidates. Understand them."**
-> This is a production-grade, multi-agent AI system that conducts real technical interviews, scores candidates with evidence-based reasoning, and generates week-by-week personalized learning roadmaps â€” all in minutes.
+> This is a production-grade, multi-agent AI system that conducts real technical interviews, scores candidates with evidence-based reasoning, and generates week-by-week personalized learning roadmaps — all in minutes.
 
 ---
 
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.31+-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
-![Gemini](https://img.shields.io/badge/Gemini_2.5_Flash-Primary_AI-8E75B2?style=for-the-badge&logo=google&logoColor=white)
-![Groq](https://img.shields.io/badge/Groq_LLaMA_3.3_70B-Fallback_AI-F55036?style=for-the-badge)
-![Pydantic](https://img.shields.io/badge/Pydantic_v2-Schema_Validation-E92063?style=for-the-badge)
-![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Production_Ready-brightgreen?style=for-the-badge)
-
----
-
-## ðŸ“Œ Problem Statement
+## Problem Statement
 
 ### The Broken Hiring Pipeline
 
 Modern technical recruiting is fundamentally broken:
 
-- **Recruiters are overwhelmed.** A single senior engineering role receives 300â€“500 applications. Manually screening them is impossible.
-- **Keyword-matching ATS systems are blind.** A candidate who listed "Python" on their resume may have written 2 scripts or architected 10 microservices â€” the ATS cannot tell the difference.
+- **Recruiters are overwhelmed.** A single senior engineering role receives 300-500 applications. Manually screening them is impossible.
+- **Keyword-matching ATS systems are blind.** A candidate who listed "Python" on their resume may have written 2 scripts or architected 10 microservices — the ATS cannot tell the difference.
 - **Generic assessments don't adapt.** A fixed quiz with 20 questions treats a Senior Engineer the same as a Junior. There is no depth.
 - **Skill gap reports are non-actionable.** Even when a candidate is "not quite there," companies rarely give them structured feedback. Talent is lost.
 
@@ -38,7 +27,7 @@ Modern technical recruiting is fundamentally broken:
 
 ---
 
-## ðŸ’¡ Solution Overview
+## Solution Overview
 
 **This system** replaces the broken screening pipeline with a fully autonomous, multi-agent AI interview system:
 
@@ -58,15 +47,15 @@ Modern technical recruiting is fundamentally broken:
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
-    subgraph UI ["🖥️ Streamlit Frontend"]
+    subgraph UI ["Streamlit Frontend"]
         A[Step 1: Document Upload] --> B[Step 2: Live Interview Chat]
         B --> C[Step 3: Results & Roadmap]
     end
-    subgraph Logic ["🧠 AI Agent Core"]
+    subgraph Logic ["AI Agent Core"]
         D[ParserAgent]
         E[SkillExtractorAgent]
         F[AssessmentAgent]
@@ -76,7 +65,7 @@ flowchart TD
         J[LearningPlanAgent]
     end
 
-    subgraph Infra ["⚡ AI Orchestration Layer"]
+    subgraph Infra ["AI Orchestration Layer"]
         L[AIRouter]
         M[KeyManager]
         N[AICache]
@@ -122,7 +111,7 @@ flowchart TD
 
 ---
 
-## ⚙️ Tech Stack
+## Tech Stack
 
 ### Frontend
 | Technology | Why Chosen |
@@ -141,29 +130,29 @@ flowchart TD
 ### Backend & Infrastructure
 | Technology | Why Chosen |
 |---|---|
-| **Python 3.12** | Latest stable. `asyncio` native support for true parallel key racing |
+| **Python 3.12** | Latest stable. asyncio native support for true parallel key racing |
 | **FastAPI** | REST API layer for programmatic access to the assessment pipeline |
-| **PyMuPDF (fitz)** | High-fidelity PDF text extraction. More accurate than `pdfplumber` for dense technical resumes |
-| **Docker** | Containerized deployment. Includes `libmupdf-dev` for PDF support |
+| **PyMuPDF (fitz)** | High-fidelity PDF text extraction. More accurate than pdfplumber for dense technical resumes |
+| **Docker** | Containerized deployment. Includes libmupdf-dev for PDF support |
 | **diskcache** | Persistent disk-based caching with TTL. Prevents redundant AI calls for identical inputs |
 | **Streamlit Cloud** | Zero-config deployment with native Secrets management |
 
 ---
 
-## 🔄 Workflow & Data Flow
+## Workflow & Data Flow
 
 ```mermaid
 sequenceDiagram
-    participant U as ðŸ‘¤ User
-    participant UI as ðŸ–¥ï¸ Streamlit UI
-    participant PA as ðŸ“„ ParserAgent
-    participant SE as ðŸ” SkillExtractor
-    participant AA as ðŸŽ¤ AssessmentAgent
-    participant SC as ðŸ“Š ScoringAgent
-    participant GA as ðŸ“ GapAnalysis
-    participant LP as ðŸ—ºï¸ LearningPlan
-    participant AR as âš¡ AIRouter
-    participant KM as ðŸ”‘ KeyManager
+    participant U as User
+    participant UI as Streamlit UI
+    participant PA as ParserAgent
+    participant SE as SkillExtractor
+    participant AA as AssessmentAgent
+    participant SC as ScoringAgent
+    participant GA as GapAnalysis
+    participant LP as LearningPlan
+    participant AR as AIRouter
+    participant KM as KeyManager
 
     U->>UI: Upload Resume + JD (PDF/TXT)
     UI->>PA: parse_resume(text)
@@ -203,28 +192,28 @@ sequenceDiagram
 
 ---
 
-## âœ¨ Features
+## Features
 
 ### Core Features
-- **ðŸ“„ Multi-format Document Ingestion** â€” Upload PDF or TXT, or paste text directly for both Resume and Job Description
-- **ðŸŽ¯ Weighted Skill Extraction** â€” Reads the JD and assigns each skill a required proficiency (1â€“10) and an importance weight (1â€“5 critical)
-- **ðŸŽ¤ Adaptive Real-Time Interview** â€” Questions are generated dynamically and streamed token-by-token. Difficulty adapts based on conversation history
-- **ðŸ“Š Evidence-Based Scoring** â€” Scores are never arbitrary. The AI cites specific things the candidate said (or failed to say) as evidence
-- **ðŸ”¬ Behavioral Analysis Layer** â€” Separate AI agent evaluates communication clarity, answer conciseness, and perceived confidence
-- **ðŸ“ Deterministic Gap Prioritization** â€” `priority = importance_weight Ã— (required_proficiency âˆ’ actual_score)`. Pure math, fully auditable
+- **Multi-format Document Ingestion** — Upload PDF or TXT, or paste text directly for both Resume and Job Description
+- **Weighted Skill Extraction** — Reads the JD and assigns each skill a required proficiency (1-10) and an importance weight (1-5 critical)
+- **Adaptive Real-Time Interview** — Questions are generated dynamically and streamed token-by-token. Difficulty adapts based on conversation history
+- **Evidence-Based Scoring** — Scores are never arbitrary. The AI cites specific things the candidate said (or failed to say) as evidence
+- **Behavioral Analysis Layer** — Separate AI agent evaluates communication clarity, answer conciseness, and perceived confidence
+- **Deterministic Gap Prioritization** — `priority = importance_weight × (required_proficiency - actual_score)`. Pure math, fully auditable
 
 ### Advanced Features
-- **âš¡ Parallel Key Racing** â€” 3 API keys are fired simultaneously using `asyncio.wait(FIRST_COMPLETED)`. The first response wins; others are cancelled. Eliminates rate-limit bottlenecks
-- **ðŸ”‘ Intelligent Key Manager** â€” Tracks health of up to 50 keys per provider. Rate-limited keys enter a 60-second cooldown; random failures enter 10-second cooldown. LRU rotation ensures fair distribution
-- **ðŸ”„ Automatic Provider Failover** â€” If all Gemini keys fail, the router switches to Groq automatically
-- **ðŸ’¾ 24-Hour Disk Cache** â€” Identical prompts return cached responses instantly, reducing cost and latency by up to 80% in repeated assessment sessions
-- **ðŸ—ºï¸ Mastery Intelligence Blueprint** â€” The learning plan uses a 3-tier system: GAP skills (score 0â€“4) get 4 weeks of depth; DEVELOPING (5â€“7) get 2 weeks; STRONG (8â€“10) get zero (no busy work)
-- **ðŸ“º 3-Level Video Curation** â€” Each week's plan includes Easy, Medium, and Hard YouTube resources with realistic time estimates
-- **ðŸ‘ï¸ Vision Evaluator (Experimental)** â€” Analyzes screen-share frames to detect what code the candidate is writing and suggest contextual follow-up questions
+- **Parallel Key Racing** — 3 API keys are fired simultaneously using `asyncio.wait(FIRST_COMPLETED)`. The first response wins; others are cancelled. Eliminates rate-limit bottlenecks
+- **Intelligent Key Manager** — Tracks health of up to 50 keys per provider. Rate-limited keys enter a 60-second cooldown; random failures enter 10-second cooldown. LRU rotation ensures fair distribution
+- **Automatic Provider Failover** — If all Gemini keys fail, the router switches to Groq automatically
+- **24-Hour Disk Cache** — Identical prompts return cached responses instantly, reducing cost and latency by up to 80% in repeated assessment sessions
+- **Mastery Roadmap Logic** — The learning plan uses a 3-tier system: GAP skills (score 0-4) get 4 weeks of depth; DEVELOPING (5-7) get 2 weeks; STRONG (8-10) get zero (no busy work)
+- **3-Level Video Curation** — Each week's plan includes Easy, Medium, and Hard YouTube resources with realistic time estimates
+- **Vision Evaluator (Experimental)** — Analyzes screen-share frames to detect what code the candidate is writing and suggest contextual follow-up questions
 
 ---
 
-## ðŸ“Š Performance & Benchmarks
+## Performance & Benchmarks
 
 ### AI Response Latency (Parallel Racing vs Sequential)
 
@@ -243,25 +232,25 @@ xychart-beta
 
 ```mermaid
 graph LR
-    A[ðŸŸ¢ Expert 9-10] --> B[Deep-dive answers, no prompting needed]
-    C[ðŸ”µ Advanced 7-8] --> D[Correct with minor gaps]
-    E[ðŸŸ¡ Intermediate 5-6] --> F[Fundamentals solid, advanced missing]
-    G[ðŸŸ  Beginner 3-4] --> H[Surface level, cannot apply]
-    I[ðŸ”´ Novice 1-2] --> J[Cannot answer core questions]
+    A[Expert 9-10] --> B[Deep-dive answers, no prompting needed]
+    C[Advanced 7-8] --> D[Correct with minor gaps]
+    E[Intermediate 5-6] --> F[Fundamentals solid, advanced missing]
+    G[Beginner 3-4] --> H[Surface level, cannot apply]
+    I[Novice 1-2] --> J[Cannot answer core questions]
 ```
 
 ### Key Rotation Health Model
 
 | Event | Action | Cooldown |
 |---|---|---|
-| `HTTP 429 / rate limit / quota` | Key enters cooldown | 60 seconds |
+| HTTP 429 / rate limit / quota | Key enters cooldown | 60 seconds |
 | Generic API error | Key enters cooldown | 10 seconds |
 | Successful response | Key health reset | Immediate |
 | All keys in cooldown | Force-use soonest expiring key | N/A |
 
 ### Demo Pipeline Output (Real Run)
 
-```
+```text
 [2/6] Extracting Skills from JD...
   - Python         (Req: 8/10, Imp: 5/5)
   - FastAPI         (Req: 7/10, Imp: 4/5)
@@ -271,19 +260,19 @@ graph LR
   - Microservices   (Req: 8/10, Imp: 5/5)
 
 [3&4/6] Running Assessment & Scoring Engine...
-  Score for FastAPI : 0/10  (Conf: 0.90) â€” No practical knowledge demonstrated
-  Score for Docker  : 6/10  (Conf: 0.85) â€” Solid intermediate understanding
+  Score for FastAPI : 0/10  (Conf: 0.90) — No practical knowledge demonstrated
+  Score for Docker  : 6/10  (Conf: 0.85) — Solid intermediate understanding
 
 [5/6] Gap Analysis...
-  - Python          : Gap 8  (Priority: 40) â† highest priority
+  - Python          : Gap 8  (Priority: 40) ← highest priority
   - Microservices   : Gap 8  (Priority: 40)
   - SQL Databases   : Gap 7  (Priority: 35)
-  - Docker          : Gap 0  (Priority:  0) â† requirement met âœ“
+  - Docker          : Gap 0  (Priority:  0) ← requirement met ✓
 ```
 
 ---
 
-### 🖼️ Demo & Walkthrough
+### Demo & Walkthrough
 
 #### 1. Document Setup
 Upload a Job Description and Resume (PDF or paste text). The system accepts both formats without configuration and performs instant skill extraction.
@@ -299,12 +288,12 @@ A comprehensive dashboard showing:
 
 ---
 
-## 🛠️ Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 
 - Python 3.12+
-- At least one API key for **Google Gemini** (`GEMINI_API_KEY`) or **Groq** (`GROQ_API_KEY`)
+- At least one API key for Google Gemini (GEMINI_API_KEY) or Groq (GROQ_API_KEY)
 
 ### 1. Clone the Repository
 
@@ -339,7 +328,7 @@ Copy the example and fill in your API keys:
 cp .env.example .env
 ```
 
-Edit `.env`:
+Edit .env:
 
 ```env
 # Primary provider: "gemini" or "groq"
@@ -360,7 +349,7 @@ GROQ_API_KEY=your_primary_groq_key
 streamlit run ui/app.py
 ```
 
-Open your browser to `http://localhost:8501`
+Open your browser to http://localhost:8501
 
 ### 6. (Optional) Run the CLI Pipeline Demo
 
@@ -370,7 +359,7 @@ python main.py
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 .
@@ -388,36 +377,36 @@ python main.py
 
 ---
 
-## ðŸ” API & Environment Variables
+## API & Environment Variables
 
 | Variable | Required | Description |
 |---|---|---|
-| `AI_PROVIDER` | No | `gemini` (default) or `groq` |
-| `GEMINI_API_KEY` | Yes* | Primary Google Gemini API key |
-| `GEMINI_API_KEY1` â€¦ `GEMINI_API_KEY29` | No | Additional keys for parallel racing (up to 30 total) |
-| `GROQ_API_KEY` | Yes* | Primary Groq API key (fallback provider) |
-| `GROQ_API_KEY1` â€¦ `GROQ_API_KEY19` | No | Additional Groq keys (up to 20 total) |
-| `GEMINI_MODEL` | No | Gemini model ID (default: `gemini-2.5-flash`) |
-| `GROQ_MODEL` | No | Groq model ID (default: `llama-3.3-70b-versatile`) |
-| `CACHE_DIR` | No | Disk cache directory (default: `.cache`) |
-| `CACHE_EXPIRATION_SECONDS` | No | Cache TTL in seconds (default: `86400` / 24h) |
+| AI_PROVIDER | No | gemini (default) or groq |
+| GEMINI_API_KEY | Yes* | Primary Google Gemini API key |
+| GEMINI_API_KEY1 ... GEMINI_API_KEY29 | No | Additional keys for parallel racing (up to 30 total) |
+| GROQ_API_KEY | Yes* | Primary Groq API key (fallback provider) |
+| GROQ_API_KEY1 ... GROQ_API_KEY19 | No | Additional Groq keys (up to 20 total) |
+| GEMINI_MODEL | No | Gemini model ID (default: gemini-2.5-flash) |
+| GROQ_MODEL | No | Groq model ID (default: llama-3.3-70b-versatile) |
+| CACHE_DIR | No | Disk cache directory (default: .cache) |
+| CACHE_EXPIRATION_SECONDS | No | Cache TTL in seconds (default: 86400 / 24h) |
 
-> *At least one of `GEMINI_API_KEY` or `GROQ_API_KEY` is required.
+> *At least one of GEMINI_API_KEY or GROQ_API_KEY is required.
 
 **Getting API Keys:**
-- **Gemini:** [Google AI Studio](https://aistudio.google.com/app/apikey) â€” Free tier available
-- **Groq:** [console.groq.com](https://console.groq.com) â€” Free tier with generous rate limits
+- Gemini: [Google AI Studio](https://aistudio.google.com/app/apikey) — Free tier available
+- Groq: [console.groq.com](https://console.groq.com) — Free tier with generous rate limits
 
 ---
 
-## ðŸš€ Deployment
+## Deployment
 
-### Option 1: Streamlit Cloud (Recommended â€” Free)
+### Option 1: Streamlit Cloud (Recommended — Free)
 
 1. Push your code to GitHub
-2. Go to [share.streamlit.io](https://share.streamlit.io) â†’ **New App**
-3. Select repository, set **Main file path:** `ui/app.py`
-4. Go to **Settings â†’ Secrets** and add your API keys in TOML format:
+2. Go to share.streamlit.io -> New App
+3. Select repository, set Main file path: ui/app.py
+4. Go to Settings -> Secrets and add your API keys in TOML format:
 
 ```toml
 AI_PROVIDER = "gemini"
@@ -426,7 +415,7 @@ GEMINI_API_KEY1 = "your_second_key"
 GROQ_API_KEY = "your_groq_key"
 ```
 
-5. Deploy â†’ Live in under 2 minutes.
+5. Deploy -> Live in under 2 minutes.
 
 ### Option 2: Docker (Self-Hosted)
 
@@ -438,7 +427,7 @@ docker-compose up --build
 # FastAPI REST available at http://localhost:8000
 ```
 
-`docker-compose.yml` spins up both services with shared environment variables.
+docker-compose.yml spins up both services with shared environment variables.
 
 ### Option 3: Cloud VM (AWS EC2 / GCP / Azure)
 
@@ -451,26 +440,26 @@ echo "GEMINI_API_KEY=your_key" > .env
 nohup streamlit run ui/app.py --server.port 8501 --server.address 0.0.0.0 &
 ```
 
-Open port `8501` in your security group / firewall rules.
+Open port 8501 in your security group / firewall rules.
 
 ---
 
-## ðŸ“ˆ Future Improvements
+## Future Improvements
 
 | Feature | Description | Priority |
 |---|---|---|
-| **ðŸŽ™ï¸ Voice Interview Mode** | Replace text chat with real-time speech-to-text (Whisper API) + TTS for a fully voice-driven interview | High |
-| **ðŸ“¹ Live Vision Integration** | Connect `VisionEvaluatorAgent` to browser screen-share via WebRTC. AI pair-programmer watches the candidate code in real-time | High |
-| **ðŸ¢ Recruiter Dashboard** | Multi-candidate comparison view with exportable PDF reports and ATS integration (Greenhouse, Lever) | High |
-| **ðŸ“Š Longitudinal Tracking** | Store candidate assessments over time. Track skill progression across multiple interviews | Medium |
-| **ðŸ¤– Multi-Agent Debate** | Two specialized AI agents debate the candidate's answers from different technical perspectives before arriving at a consensus score | Medium |
-| **âš–ï¸ Bias Auditing Layer** | Statistical analysis of scores across demographics to detect and flag potential AI bias patterns | Medium |
-| **ðŸŒ Multi-Language Support** | Conduct interviews in any language; generate roadmaps with localized resources | Low |
-| **ðŸ”Œ Webhook Integrations** | Push assessment results directly to Slack, Notion, or custom HR systems via the existing `webhook_notifier.py` infrastructure | Low |
+| Voice Interview Mode | Replace text chat with real-time speech-to-text (Whisper API) + TTS for a fully voice-driven interview | High |
+| Live Vision Integration | Connect VisionEvaluatorAgent to browser screen-share via WebRTC. AI pair-programmer watches the candidate code in real-time | High |
+| Recruiter Dashboard | Multi-candidate comparison view with exportable PDF reports and ATS integration (Greenhouse, Lever) | High |
+| Longitudinal Tracking | Store candidate assessments over time. Track skill progression across multiple interviews | Medium |
+| Multi-Agent Debate | Two specialized AI agents debate the candidate's answers from different technical perspectives before arriving at a consensus score | Medium |
+| Bias Auditing Layer | Statistical analysis of scores across demographics to detect and flag potential AI bias patterns | Medium |
+| Multi-Language Support | Conduct interviews in any language; generate roadmaps with localized resources | Low |
+| Webhook Integrations | Push assessment results directly to Slack, Notion, or custom HR systems via the existing webhook_notifier.py infrastructure | Low |
 
 ---
 
-## ðŸ¤ Contributing
+## Contributing
 
 Contributions are welcome and encouraged!
 
@@ -485,12 +474,12 @@ pip install -r requirements.txt
 
 ### How to Contribute
 
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/your-feature-name`
-3. **Write clean, type-hinted Python** â€” all new agents must use Pydantic models for I/O
-4. **Test your agent** by adding a section to `main.py`
-5. **Commit** with a descriptive message: `git commit -m "feat: add VoiceInterviewAgent with Whisper integration"`
-6. **Open a Pull Request** with a clear description of the change and its motivation
+1. Fork the repository
+2. Create a feature branch: git checkout -b feature/your-feature-name
+3. Write clean, type-hinted Python — all new agents must use Pydantic models for I/O
+4. Test your agent by adding a section to main.py
+5. Commit with a descriptive message: git commit -m "feat: add VoiceInterviewAgent with Whisper integration"
+6. Open a Pull Request with a clear description of the change and its motivation
 
 ### Adding a New Agent
 
@@ -516,41 +505,14 @@ class YourNewAgent:
         )
 ```
 
-The `ai_router` handles all complexity: key selection, parallel racing, caching, and structured output parsing.
-
----
-
-## ðŸ“œ License
-
-This project is licensed under the **MIT License**.
-
-```
-MIT License
-
-Copyright (c) 2026 AI Skill Assessment Contributors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-```
+The ai_router handles all complexity: key selection, parallel racing, caching, and structured output parsing.
 
 ---
 
 <div align="center">
 
-**Built with â¤ï¸ by the AI Skill Assessment Team**
+**Built by the AI Skill Assessment Team**
 
-*Powered by Gemini 2.5 Flash Â· Groq LLaMA 3.3 Â· Pydantic v2 Â· Streamlit*
+*Powered by Gemini 2.5 Flash · Groq LLaMA 3.3 · Pydantic v2 · Streamlit*
 
 </div>
-
