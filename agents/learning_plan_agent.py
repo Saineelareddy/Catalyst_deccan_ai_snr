@@ -103,6 +103,25 @@ class LearningPlanAgent:
     def __init__(self):
         self.system_prompt = SYSTEM_PROMPT
 
+    def generate_plan(
+        self,
+        prioritized_gaps: List[SkillGap],
+        candidate_name: str = "Candidate",
+        target_role: str = "Software Engineer",
+        **kwargs # Swallow extra args like weeks_available
+    ) -> DetailedLearningPlan:
+        """Synchronous wrapper for generate_plan."""
+        import asyncio
+        try:
+            loop = asyncio.get_running_loop()
+            if loop.is_running():
+                import nest_asyncio
+                nest_asyncio.apply()
+                return loop.run_until_complete(self.agenerate_plan(prioritized_gaps, candidate_name, target_role))
+            return asyncio.run(self.agenerate_plan(prioritized_gaps, candidate_name, target_role))
+        except RuntimeError:
+            return asyncio.run(self.agenerate_plan(prioritized_gaps, candidate_name, target_role))
+
     async def agenerate_plan(
         self,
         prioritized_gaps: List[SkillGap],

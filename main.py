@@ -153,13 +153,14 @@ def main():
     plan = planner.generate_plan(gaps, weeks_available=2)
     
     print("\nFinal Learning Plan Summary:")
-    print(plan.summary)
-    for week in plan.weeks:
-        print(f"\nWeek {week.week_number}: {week.focus_skill}")
-        print(f"  Objective: {week.objective}")
-        print(f"  Task: {week.practical_task}")
-        for res in week.resources:
-            print(f"  - [{res.type}] {res.title} (~{res.estimated_hours}h) -> {res.url}")
+    print(f"Candidate: {plan.candidate_name} | Role: {plan.target_role} | Total Prep: {plan.total_weeks} weeks")
+    
+    for s_plan in plan.skills:
+        print(f"\n◈ Skill: {s_plan.skill_name} ({s_plan.category})")
+        print(f"  Feedback: {s_plan.candidate_feedback}")
+        for week in s_plan.topics:
+            print(f"  [{week.week_label}] {week.title}: {week.objective}")
+            print(f"    - Milestone: {week.hands_on}")
 
     print("\nPipeline Complete!")
 
