@@ -1,0 +1,39 @@
+from typing import List, Dict
+from pydantic import BaseModel, Field
+from utils.ai_router import ai_router
+
+class AssessmentQuestion(BaseModel):
+    question: str = Field(description="The interview question to ask the candidate.")
+    expected_key_points: List[str] = Field(description="Key points expected in a strong answer.")
+    difficulty: int = Field(description="Difficulty level of the question on a scale of 1-10.")
+
+class AssessmentAgent:
+    """
+    Dynamically generates conversational, technical interview questions for a specific skill.
+    Adapts based on the conversation history and avoids resume-bias.
+    """
+    def __init__(self):
+        self.system_prompt = (
+            "You are an expert Technical Interviewer AI. Your goal is to assess a candidate's REAL "
+            "knowledge of a specific skill. Do NOT just ask them to repeat their resume. "
+            "Ask scenario-based, deep-dive technical questions. "
+            "Adapt the difficulty based on their previous answers: if they answer well, increase difficulty. "
+            "If they struggle, simplify or test fundamentals."
+        )
+
+    async def astream_question(
+        self, 
+        skill_name: str, 
+        target_proficiency: int, 
+        candidate_resume_context: str, 
+        chat_history: List[Dict[str, str]]
+    ):
+        """Streams the question text for immediate display."""
+        history_str = "".join([f"{msg['role'].capitalize()}: {msg['content']}\n" for msg in chat_history])
+        prompt = (
+            f"Target Skill: {skill_name}\n"
+            f"Conversation History:\n{history_str}\n"
+            "Generate the NEXT technical question. Respond ONLY with the question text."
+        )
+        async for chunk in ai_router.astream(prompt, self.system_prompt):
+            yield chunk

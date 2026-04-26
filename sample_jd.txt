@@ -1,0 +1,11 @@
+Senior Backend Engineer (Python)
+
+Role Overview:
+We are looking for a Senior Backend Engineer to join our core team. You will be responsible for designing and implementing scalable microservices using Python and FastAPI.
+
+Key Requirements:
+- 5+ years of experience with Python.
+- Strong expertise in FastAPI or similar web frameworks.
+- Proficiency in PostgreSQL and database design.
+- Experience with Docker and container orchestration.
+- Excellent problem-solving skills and communication.

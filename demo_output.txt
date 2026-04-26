@@ -1,0 +1,72 @@
+==================================================
+Starting AI Skill Assessment Pipeline...
+==================================================
+
+[1/6] Parsing JD and Resume...
+Resume Parsed. Found Skills: ['Python', 'Flask', 'JavaScript', 'PostgreSQL', 'HTML']
+
+[2/6] Extracting Skills from JD...
+  - Python: (Req: 8/10, Imp: 5/5)
+  - FastAPI: (Req: 7/10, Imp: 4/5)
+  - Django: (Req: 7/10, Imp: 4/5)
+  - Docker: (Req: 6/10, Imp: 4/5)
+  - Kubernetes: (Req: 6/10, Imp: 4/5)
+  - SQL Databases: (Req: 7/10, Imp: 5/5)
+  - NoSQL Databases: (Req: 6/10, Imp: 4/5)
+  - Microservices Architecture: (Req: 8/10, Imp: 5/5)
+  - Performance Optimization: (Req: 7/10, Imp: 4/5)
+  - Software Quality Assurance: (Req: 7/10, Imp: 4/5)
+  - Communication Skills: (Req: 7/10, Imp: 3/5)
+
+[3&4/6] Running Assessment & Scoring Engine...
+
+  Assessing: FastAPI
+  Generated Next Question (Diff 6/10): You mentioned using `g` or `current_app` for application context in Flask. In FastAPI, request-specific context is often handled differently due to its asynchronous nature. How would you design a system in FastAPI to pass a database session or user authentication context to multiple independent route handlers without relying on global variables?
+  Score for FastAPI: 0/10 (Conf: 0.90)
+  Reasoning: The candidate explicitly admitted they haven't used FastAPI much. Their answers revolve around Flask concepts, showing no practical knowledge or experience with FastAPI's core mechanics like dependency injection.
+
+  Assessing: Docker
+  Generated Next Question (Diff 7/10): You explained that ENTRYPOINT is the executable and CMD provides default arguments. Let's say your Python application requires a configuration file that changes based on the environment (dev, staging, prod). How would you pass these different configurations into your Docker container at runtime without hardcoding them into the image or creating separate images for each environment?
+  Score for Docker: 6/10 (Conf: 0.85)
+  Reasoning: The candidate correctly identified multi-stage builds and caching strategies for optimizing a Python Dockerfile. They also accurately distinguished between ENTRYPOINT and CMD. This demonstrates a solid intermediate understanding of Docker fundamentals.
+
+[5/6] Performing Skill Gap Analysis...
+  - Python: Gap of 8 (Priority: 40) -> Candidate is missing 8 points in a critical skill.
+  - Microservices Architecture: Gap of 8 (Priority: 40) -> Candidate is missing 8 points in a critical skill.
+  - SQL Databases: Gap of 7 (Priority: 35) -> Candidate is missing 7 points in a critical skill.
+  - FastAPI: Gap of 7 (Priority: 28) -> Candidate is missing 7 points in a critical skill.
+  - Django: Gap of 7 (Priority: 28) -> Candidate is missing 7 points in a critical skill.
+  - Performance Optimization: Gap of 7 (Priority: 28) -> Candidate is missing 7 points in a critical skill.
+  - Software Quality Assurance: Gap of 7 (Priority: 28) -> Candidate is missing 7 points in a critical skill.
+  - Kubernetes: Gap of 6 (Priority: 24) -> Candidate is missing 6 points in a critical skill.
+  - NoSQL Databases: Gap of 6 (Priority: 24) -> Candidate is missing 6 points in a critical skill.
+  - Communication Skills: Gap of 7 (Priority: 21) -> Candidate is missing 7 points in a secondary skill.
+  - Docker: Gap of 0 (Priority: 0) -> Requirement met.
+
+[6/6] Generating Personalized Learning Plan...
+
+Final Learning Plan Summary:
+This 2-week learning plan is designed to rapidly address the candidate's most critical skill gaps, with an emphasis on foundational Python programming, followed by practical web service development using FastAPI and fundamental SQL database interaction. While no specific prior skills were listed, this plan assumes an underlying capacity for logical problem-solving and rapid technical learning, which are critical transferable skills for any developer. The strategy focuses on building a robust base in Python before moving to application development, allowing for practical application of new concepts immediately.
+
+Week 1: Python Fundamentals
+  Objective: By the end of this week, the candidate will be proficient in Python's core syntax, data structures, control flow, functions, and basic object-oriented programming concepts, enabling them to write clear, functional Python scripts.
+  Task: Develop a command-line application in Python. Examples include a simple 'To-Do List' manager (add, view, mark complete tasks), a basic calculator, or a text-based 'Hangman' game. Focus on using functions, lists/dictionaries, and basic file I/O for persistence.
+  - [Documentation] The Python Tutorial (~15h) -> https://docs.python.org/3/tutorial/index.html
+  - [Interactive Course] Python for Everybody Specialization (Course 1: Programming for Everybody (Getting Started with Python)) (~20h) -> https://www.coursera.org/learn/python
+  - [Book] Automate the Boring Stuff with Python (Chapters 1-6) (~10h) -> https://automatetheboringstuff.com/
+
+Week 2: FastAPI & SQL Databases
+  Objective: By the end of this week, the candidate will be able to build a basic RESTful API using FastAPI, interact with a PostgreSQL database using an ORM (SQLAlchemy), and perform fundamental CRUD (Create, Read, Update, Delete) operations. This also serves as an introduction to building independent services, a foundational concept for Microservices Architecture.
+  Task: Create a FastAPI application for managing a collection of items (e.g., 'Books' with title, author, and year). Implement API endpoints for: 
+1. Creating a new book.
+2. Retrieving all books.
+3. Retrieving a single book by ID.
+4. Updating a book's details.
+5. Deleting a book.
+Use a PostgreSQL database with SQLAlchemy ORM for data persistence. Dockerize the FastAPI application and PostgreSQL database for easier setup and deployment.
+  - [Documentation] FastAPI Documentation (Tutorial - User Guide) (~15h) -> https://fastapi.tiangolo.com/tutorial/first-steps/
+  - [Documentation] SQLAlchemy ORM Tutorial (~8h) -> https://docs.sqlalchemy.org/en/20/orm/tutorial.html
+  - [Documentation] PostgreSQL Tutorial (~10h) -> https://www.postgresqltutorial.com/
+  - [Interactive Course] SQLZoo (~7h) -> https://sqlzoo.net/wiki/SQL_Tutorial
+
+Pipeline Complete!

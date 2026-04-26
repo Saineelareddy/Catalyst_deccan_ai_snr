@@ -1,0 +1,120 @@
+/* Premium UI Styles for AI Skill Assessment */
+
+:root {
+    --primary-color: #7c3aed; /* Vibrant Purple */
+    --secondary-color: #a78bfa;
+    --bg-dark: #0f172a;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --text-main: #f8fafc;
+    --text-dim: #94a3b8;
+}
+
+.stApp {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+}
+
+/* Progress Bar Container */
+.stepper-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Connecting Line */
+.stepper-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #334155;
+    z-index: 1;
+    transform: translateY(-50%);
+}
+
+.stepper-line-progress {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 4px;
+    background: var(--primary-color);
+    z-index: 2;
+    transform: translateY(-50%);
+    transition: width 0.5s ease-in-out;
+}
+
+/* Step Circles */
+.step {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 3px solid #334155;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+    font-weight: bold;
+    color: var(--text-dim);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.step.active {
+    background: var(--primary-color);
+    border-color: var(--secondary-color);
+    color: white;
+    box-shadow: 0 0 15px var(--primary-color);
+    transform: scale(1.1);
+}
+
+.step.completed {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.step-label {
+    position: absolute;
+    top: 50px;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+.step.active .step-label {
+    color: var(--text-main);
+    font-weight: bold;
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}

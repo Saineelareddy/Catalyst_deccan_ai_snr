@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.DS_Store
+.streamlit/config.toml
+.streamlit/secrets.toml
+.cache/
+scratch/
+node_modules/
+dist/
+build/
+.vscode/
+.idea/
