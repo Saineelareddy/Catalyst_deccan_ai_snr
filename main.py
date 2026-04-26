@@ -165,4 +165,10 @@ def main():
     print("\nPipeline Complete!")
 
 if __name__ == "__main__":
-    main()
+    import asyncio
+    try:
+        main()
+    except asyncio.CancelledError:
+        print("\nPipeline interrupted by user or system. Exiting gracefully...")
+    except Exception as e:
+        print(f"\nPipeline failed with error: {e}")

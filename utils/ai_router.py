@@ -151,15 +151,19 @@ class AIRouter:
     def complete(self, *args, **kwargs) -> Any:
         """Synchronous wrapper for acomplete."""
         try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            return asyncio.run(self.acomplete(*args, **kwargs))
-        else:
-            if loop.is_running():
-                import nest_asyncio
-                nest_asyncio.apply()
-                return loop.run_until_complete(self.acomplete(*args, **kwargs))
-            return asyncio.run(self.acomplete(*args, **kwargs))
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                return asyncio.run(self.acomplete(*args, **kwargs))
+            else:
+                if loop.is_running():
+                    import nest_asyncio
+                    nest_asyncio.apply()
+                    return loop.run_until_complete(self.acomplete(*args, **kwargs))
+                return asyncio.run(self.acomplete(*args, **kwargs))
+        except asyncio.CancelledError:
+            logger.warning("Sync operation cancelled.")
+            return None
 
 
 # Global router instance

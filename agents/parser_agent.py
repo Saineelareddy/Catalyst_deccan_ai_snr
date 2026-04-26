@@ -3,30 +3,30 @@ from pydantic import BaseModel, Field
 from utils.ai_router import ai_router
 
 class ExperienceItem(BaseModel):
-    role: Optional[str] = Field(None, alias="title")  # some LLMs say "title"
-    company: Optional[str] = None
-    duration: Optional[str] = None
-    description: Optional[str] = ""
+    role: Optional[Any] = Field(None, alias="title")
+    company: Optional[Any] = None
+    duration: Optional[Any] = None
+    description: Optional[Any] = ""
 
     class Config:
-        populate_by_name = True  # accept both 'role' and 'title'
+        populate_by_name = True
 
 class ProjectItem(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = ""
-    technologies: List[str] = []
+    name: Optional[Any] = None
+    description: Optional[Any] = ""
+    technologies: List[Any] = []
 
 class EducationItem(BaseModel):
-    degree: Optional[str] = None
-    institution: Optional[str] = None
-    year: Optional[str] = None
+    degree: Optional[Any] = None
+    institution: Optional[Any] = None
+    year: Optional[Any] = None
 
 class ParsedDocument(BaseModel):
-    name: Optional[str] = Field(None, description="Full name of the candidate or contact person")
-    skills: List[str] = Field(default=[], description="List of raw skills extracted from the document")
-    experience: List[Any] = Field(default=[], description="List of experience items")
-    projects: List[Any] = Field(default=[], description="List of projects")
-    education: List[Any] = Field(default=[], description="List of education items")
+    name: Optional[Any] = Field(None)
+    skills: List[Any] = Field(default=[])
+    experience: List[ExperienceItem] = Field(default=[])
+    projects: List[ProjectItem] = Field(default=[])
+    education: List[EducationItem] = Field(default=[])
 
 class ParserAgent:
     """
