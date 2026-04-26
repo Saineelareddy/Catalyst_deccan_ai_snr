@@ -33,9 +33,11 @@ class AIRouter:
                        system_prompt: Optional[str] = None, 
                        response_model: Optional[Type[T]] = None, 
                        parallel_count: int = 3,
+                       max_attempts: int = 3,
                        bypass_cache: bool = False) -> str | T:
         """
         Asynchronously completes a request, racing multiple API keys in parallel.
+        Implements robust retry logic across batches of keys.
         """
         if response_model:
             schema_instruction = generate_schema_prompt(response_model)
@@ -54,53 +56,51 @@ class AIRouter:
                 logger.info("Cache hit.")
                 return parse_structured_response(cached, response_model) if response_model else cached
 
-        # 2. Parallel Racing (The "Promise.all" equivalent logic)
-        keys = key_manager.get_best_keys(provider, count=parallel_count)
-        if not keys:
-            raise RuntimeError(f"No available keys for {provider}")
-
-        logger.info(f"Racing {len(keys)} keys in parallel for {provider}...")
+        # 2. Robust Parallel Racing with Batch Retries
+        last_exception = None
         
-        tasks = []
-        for key in keys:
-            # Explicitly create tasks from coroutines
-            tasks.append(asyncio.create_task(self._execute_with_key(client, prompt, system_prompt, key, provider)))
+        for attempt in range(max_attempts):
+            keys = key_manager.get_best_keys(provider, count=parallel_count)
+            if not keys:
+                logger.error(f"No available keys for {provider} on attempt {attempt+1}")
+                break
 
-        # Use wait with FIRST_COMPLETED to return as soon as one key succeeds
-        done, pending = await asyncio.wait(
-            tasks, 
-            return_when=asyncio.FIRST_COMPLETED
-        )
+            logger.info(f"Attempt {attempt+1}/{max_attempts}: Racing {len(keys)} keys in parallel for {provider}...")
+            
+            tasks = [asyncio.create_task(self._execute_with_key(client, prompt, system_prompt, key, provider)) for key in keys]
+            
+            # Proper racing: wait for first success, skip failures
+            pending = set(tasks)
+            while pending:
+                done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
+                
+                for task in done:
+                    try:
+                        key, response_text = task.result()
+                        # SUCCESS: Clean up and return
+                        for t in pending:
+                            t.cancel()
+                        
+                        key_manager.report_success(provider, key)
+                        
+                        if not bypass_cache:
+                            set_cached_response(cache_key, response_text)
 
-        result = None
-        exception = None
+                        if response_model:
+                            return parse_structured_response(response_text, response_model)
+                        return response_text
+                    except Exception as e:
+                        # FAILURE: Log and continue with remaining tasks in this batch
+                        logger.warning(f"Key failed: {str(e)[:100]}...")
+                        last_exception = e
+            
+            # If we get here, all tasks in this batch failed
+            logger.warning(f"All keys in attempt {attempt+1} failed. Trying next batch...")
 
-        for task in done:
-            try:
-                key, response_text = task.result()
-                result = response_text
-                key_manager.report_success(provider, key)
-                break # Take the first successful result
-            except Exception as e:
-                exception = e
-                # The _execute_with_key already reports failure to key_manager
-
-        # Cancel remaining tasks
-        for task in pending:
-            task.cancel()
-
-        if result is None:
-            if exception:
-                raise exception
-            raise RuntimeError("All parallel tasks failed.")
-
-        # 3. Cache & Parse
-        if not bypass_cache:
-            set_cached_response(cache_key, result)
-
-        if response_model:
-            return parse_structured_response(result, response_model)
-        return result
+        # 3. Final Fallback
+        if last_exception:
+            raise last_exception
+        raise RuntimeError(f"All {max_attempts} parallel racing attempts failed for {provider}.")
 
     async def _execute_with_key(self, client, prompt, system_prompt, key, provider):
         """Helper to execute and report to key manager."""
@@ -114,27 +114,44 @@ class AIRouter:
     async def astream(self, 
                      prompt: str, 
                      system_prompt: Optional[str] = None, 
-                     provider: Optional[str] = None) -> AsyncGenerator[str, None]:
+                     provider: Optional[str] = None,
+                     max_attempts: int = 5) -> AsyncGenerator[str, None]:
         """
         Streams AI response in real-time. 
-        Note: Parallel racing is not typically used for streaming to avoid multiple charges/streams.
+        Rotates through keys if the stream fails to initialize (e.g. 429).
         """
         provider = provider or settings.ai_provider
         client = self.clients.get(provider)
+        if not client:
+             raise ValueError(f"Provider {provider} not supported.")
+
+        last_exception = None
+        for attempt in range(max_attempts):
+            keys = key_manager.get_best_keys(provider, count=1)
+            if not keys:
+                break
+            
+            key = keys[0]
+            try:
+                # We try to start the stream. If it fails here (429), we catch and retry.
+                # If it fails MID-STREAM, we might have already yielded data, 
+                # so we can't easily retry without duplicate content.
+                # However, most 429s happen at the start.
+                async for chunk in client.astream(prompt, system_prompt, api_key=key):
+                    yield chunk
+                
+                # If we successfully finished the stream
+                key_manager.report_success(provider, key)
+                return 
+            except Exception as e:
+                logger.warning(f"Stream attempt {attempt+1} failed with key: {str(e)[:100]}")
+                key_manager.report_failure(provider, key, str(e))
+                last_exception = e
+                # Continue to next attempt with a new key
         
-        # Get the single best key
-        keys = key_manager.get_best_keys(provider, count=1)
-        if not keys:
-            raise RuntimeError(f"No available keys for {provider}")
-        
-        key = keys[0]
-        try:
-            async for chunk in client.astream(prompt, system_prompt, api_key=key):
-                yield chunk
-            key_manager.report_success(provider, key)
-        except Exception as e:
-            key_manager.report_failure(provider, key, str(e))
-            raise e
+        if last_exception:
+            raise last_exception
+        raise RuntimeError(f"All {max_attempts} streaming attempts failed for {provider}.")
 
     def complete(self, *args, **kwargs) -> Any:
         """Synchronous wrapper for acomplete for backward compatibility."""

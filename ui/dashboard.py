@@ -105,7 +105,7 @@ def render_results_dashboard(assessment_data: dict, plan) -> None:
     
     with col_h2:
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("📥 EXPORT INTELLIGENCE PDF", use_container_width=True):
+        if st.button("📥 EXPORT INTELLIGENCE PDF", use_container_width=True, key="btn_export_pdf"):
              st.toast("Generating Neural Blueprint PDF...", icon="🧠")
     
     # 3. Intelligence Metrics Row

@@ -161,7 +161,7 @@ if st.session_state.current_step == 0:
             resume_input = st.text_area("Paste Resume Text here", height=200, key="resume_text_area")
             resume_file = None
     
-    if st.button("Analyze Documents"):
+    if st.button("Analyze Documents", key="btn_analyze"):
         jd_text = ""
         resume_text = ""
         
@@ -251,12 +251,12 @@ elif st.session_state.current_step == 1:
         st.markdown("---")
         c_back, c_next = st.columns([1, 4])
         
-        if c_back.button("← Back to Setup"):
+        if c_back.button("← Back to Setup", key="btn_back_setup"):
             st.session_state.current_step = 0
             st.rerun()
 
         if len(history) >= 2: # At least one Q&A pair
-            if c_next.button("Finish this Skill & Evaluate"):
+            if c_next.button("Finish this Skill & Evaluate", key="btn_evaluate_skill"):
                 with st.spinner("Scoring..."):
                     score = agents["scorer"].evaluate_skill(current_skill.skill_name, history)
                     st.session_state.actual_scores.append(score)
@@ -278,8 +278,8 @@ elif st.session_state.current_step == 2:
     # 1. Plan already generated in processing phase
     plan = st.session_state.learning_plan
 
-    # 2. Results Dashboard
-    render_results_dashboard({}, plan) # Using {} for backward compat if needed, but 'plan' is the main source now
+    # 2. Results Dashboard (Removed redundant call to avoid duplicate IDs)
+    # render_results_dashboard({}, plan) 
 
     # 3. Unified UI Layout
     st.markdown(f"### 🚀 Performance & Roadmap: {plan.candidate_name}")
@@ -290,65 +290,100 @@ elif st.session_state.current_step == 2:
         render_results_dashboard({}, plan)
 
     with tab_roadmap:
-        st.markdown("<br>", unsafe_allow_html=True)
-        inner_tabs = st.tabs([f"◈ {s.skill_name}" for s in plan.skills])
+        st.markdown('<div class="mesh-bg"></div>', unsafe_allow_html=True)
+        st.markdown('<div class="cyber-roadmap">', unsafe_allow_html=True)
         
-        for skill_idx, (itab, skill) in enumerate(zip(inner_tabs, plan.skills)):
-            with itab:
-                # 1. Feedback Box
-                st.markdown(f"""
-                <div class="insight-box">
-                    <div class="insight-title">Neural Feedback</div>
-                    <div style="color:#f8fafc; font-size:1.1rem; line-height:1.5;">{skill.candidate_feedback}</div>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                if not skill.topics:
-                    st.success(f"✅ Mastery Achieved: You have met all requirements for {skill.skill_name}.")
-                    continue
+        # Skill-specific roadmaps in inner tabs
+        skills_with_plans = [s for s in plan.skills if s.topics]
+        if not skills_with_plans:
+            st.success("✨ Mastery DNA Detected: No learning gaps found for the assessed skills!")
+        else:
+            inner_tabs = st.tabs([f"◈ {s.skill_name}" for s in skills_with_plans])
+            
+            for skill_idx, (itab, skill) in enumerate(zip(inner_tabs, skills_with_plans)):
+                with itab:
+                    # Neural Feedback Header (Premium Style)
+                    st.markdown(f"""<div class="glass-box" style="margin-bottom: 4rem; border-left: 4px solid var(--primary-cyan);">
+<div class="box-label">◈ NEURAL SYSTEM INSIGHT</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: white; line-height: 1.6; font-weight: 400;">{skill.candidate_feedback}</div>
+</div>""", unsafe_allow_html=True)
 
-                # 2. Weekly Timeline
-                st.markdown(f"#### ◈ {skill.total_weeks}-Week Intelligence Blueprint")
-                
-                for week in skill.topics:
-                    with st.expander(f"● {week.week_label}: {week.title}", expanded=True):
-                        st.info(f"🎯 **Objective:** {week.objective}")
+                    # Render Weeks
+                    for week in skill.topics:
+                        # Skill Tags
+                        chips_html = "".join([f'<div class="skill-chip">{t}</div>' for t in week.what_to_study])
                         
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            st.markdown("**What to Study**")
-                            for topic in week.what_to_study:
-                                st.markdown(f"- {topic}")
-                            
-                            st.markdown("**Core Documentation**")
-                            for d in week.documentation:
-                                st.markdown(f"- [{d.title}]({d.url})")
-                        
-                        with col2:
-                            st.markdown("**Video Deep-Dives**")
-                            v = week.youtube
-                            st.markdown(f"🟢 [Easy] **{v.easy.channel}**: [{v.easy.title}]({v.easy.url})")
-                            st.caption(f"_{v.easy.why}_")
-                            
-                            st.markdown(f"🟡 [Medium] **{v.medium.channel}**: [{v.medium.title}]({v.medium.url})")
-                            st.caption(f"_{v.medium.why}_")
-                            
-                            st.markdown(f"🔴 [Hard] **{v.hard.channel}**: [{v.hard.title}]({v.hard.url})")
-                            st.caption(f"_{v.hard.why}_")
+                        # Documentation
+                        docs_html = "".join([
+                            f'<a href="{d.url}" target="_blank" class="doc-item">◈ {d.title}</a>' 
+                            for d in week.documentation
+                        ])
 
-                        st.markdown("---")
-                        st.success(f"🛠️ **Milestone:** {week.hands_on}")
-                        st.caption(f"Verification: {week.milestone}")
+                        # Video Logic
+                        def get_video_html(v, diff):
+                            diff_class = f"diff-{diff}"
+                            time = getattr(v, 'estimated_time', '15m')
+                            return f"""
+<a href="{v.url}" target="_blank" class="video-card">
+    <div class="video-title">{v.title}</div>
+    <div class="video-author">{v.channel} • {v.why[:100]}...</div>
+    <div class="video-footer">
+        <span class="diff-badge {diff_class}">{diff}</span>
+        <div style="color: var(--text-muted); font-size: 20px; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:24px;">⏱</span> {time}
+        </div>
+    </div>
+</a>
+"""
+
+                        st.markdown(f"""
+<div class="week-section">
+<div class="week-badge-pill">{week.week_label}</div>
+<h2 class="section-title">{week.title}</h2>
+<p class="section-subtitle" style="font-size:22px; margin-bottom:40px;">{week.objective}</p>
+
+<div class="skill-chips">
+{chips_html}
+</div>
+
+<div class="resource-grid" style="display:grid; grid-template-columns: 45% 55%; gap:50px;">
+<div style="display:flex; flex-direction:column; gap:40px;">
+<div class="milestone-card" style="margin-top:0; padding:40px; border-width:2px;">
+<div class="milestone-head">
+<span style="font-size:32px;">🚀</span>
+<span style="font-family:'JetBrains Mono', monospace; font-size:16px; letter-spacing:5px; color:var(--molten-amber); font-weight:800;">TARGET MILESTONE</span>
+</div>
+<div class="milestone-text">{week.hands_on}</div>
+<div class="verification">VERIFICATION: {week.milestone}</div>
+</div>
+
+<div class="glass-box" style="padding:40px;">
+<div class="box-label">◈ CORE DOCUMENTATION</div>
+{docs_html}
+</div>
+</div>
+
+<div style="display:flex; flex-direction:column; gap:20px;">
+<div class="box-label" style="padding-left:10px;">◈ NEURAL VIDEO LIBRARY</div>
+{get_video_html(week.youtube.easy, 'easy')}
+{get_video_html(week.youtube.medium, 'medium')}
+{get_video_html(week.youtube.hard, 'hard')}
+</div>
+</div>
+</div>""", unsafe_allow_html=True)
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
 
     # Footer Controls
     st.markdown("<br>", unsafe_allow_html=True)
     f_col1, f_col2, f_col3 = st.columns([1, 1, 3])
     
-    if f_col1.button("← Back to Assessment"):
+    if f_col1.button("← Back to Assessment", key="btn_back_assessment"):
         st.session_state.current_step = 1
         st.rerun()
 
-    if f_col2.button("↩ Start New Assessment"):
+    if f_col2.button("↩ Start New Assessment", key="btn_new_assessment"):
         for k in list(st.session_state.keys()):
             if k.startswith("w_idx_") or k.startswith("chk_"): del st.session_state[k]
         if "learning_plan" in st.session_state: del st.session_state["learning_plan"]

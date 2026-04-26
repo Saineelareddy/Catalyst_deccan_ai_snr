@@ -18,6 +18,7 @@ class YouTubeVideo(BaseModel):
     url: str
     channel: str
     why: str
+    estimated_time: str = Field(description="Realistic duration. Overviews: 10-15m. Deep Dives: 30-45m. Tutorials: 1h+.")
 
 
 class YouTubeLevels(BaseModel):
@@ -82,7 +83,9 @@ RULES:
 2. ADJACENT SKILLS: Identify 'Leverage Points' where one skill unlocks another.
 3. REAL RESOURCES:
    - Documentation: MDN, roadmap.sh, official sites only.
-   - YouTube: Exactly 3 levels (Easy/Medium/Hard). Real channels (Fireship, Corey Schafer, etc.).
+   - YouTube: Exactly 3 levels (Easy/Medium/Hard). Real channels (Fireship, Corey Schafer, etc.). 
+     Include 'estimated_time' (duration). Be realistic: Overviews are 5-15 mins, Deep Dives are 30-60 mins, 
+     Masterclasses are 1-3 hours. Match the duration to the content depth.
 4. MILESTONES: Each week must end with a 'Hands-on Milestone' project that is observable.
 
 OUTPUT: Valid JSON only."""
