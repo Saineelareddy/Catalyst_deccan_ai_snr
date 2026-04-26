@@ -1,7 +1,7 @@
-# AI-Powered Skill Assessment & Personalized Learning Engine
+# AI Skill Assessment Agent — Personalized Learning Engine
 
 > **"Don't just screen candidates. Understand them."**
-> NeuralHire is a production-grade, multi-agent AI system that conducts real technical interviews, scores candidates with evidence-based reasoning, and generates week-by-week personalized learning roadmaps — all in minutes.
+> This is a production-grade, multi-agent AI system that conducts real technical interviews, scores candidates with evidence-based reasoning, and generates week-by-week personalized learning roadmaps â€” all in minutes.
 
 ---
 
@@ -16,14 +16,14 @@
 
 ---
 
-## 📌 Problem Statement
+## ðŸ“Œ Problem Statement
 
 ### The Broken Hiring Pipeline
 
 Modern technical recruiting is fundamentally broken:
 
-- **Recruiters are overwhelmed.** A single senior engineering role receives 300–500 applications. Manually screening them is impossible.
-- **Keyword-matching ATS systems are blind.** A candidate who listed "Python" on their resume may have written 2 scripts or architected 10 microservices — the ATS cannot tell the difference.
+- **Recruiters are overwhelmed.** A single senior engineering role receives 300â€“500 applications. Manually screening them is impossible.
+- **Keyword-matching ATS systems are blind.** A candidate who listed "Python" on their resume may have written 2 scripts or architected 10 microservices â€” the ATS cannot tell the difference.
 - **Generic assessments don't adapt.** A fixed quiz with 20 questions treats a Senior Engineer the same as a Junior. There is no depth.
 - **Skill gap reports are non-actionable.** Even when a candidate is "not quite there," companies rarely give them structured feedback. Talent is lost.
 
@@ -38,9 +38,9 @@ Modern technical recruiting is fundamentally broken:
 
 ---
 
-## 💡 Solution Overview
+## ðŸ’¡ Solution Overview
 
-**NeuralHire** replaces the broken screening pipeline with a fully autonomous, multi-agent AI interview system:
+**This system** replaces the broken screening pipeline with a fully autonomous, multi-agent AI interview system:
 
 1. **Parses** a Job Description and Resume using structured AI extraction
 2. **Conducts** a live, adaptive technical interview — difficulty scales based on answers
@@ -62,32 +62,27 @@ Modern technical recruiting is fundamentally broken:
 
 ```mermaid
 flowchart TD
-    subgraph UI ["🖥️ Streamlit UI (ui/)"]
+    subgraph UI ["🖥️ Streamlit Frontend"]
         A[Step 1: Document Upload] --> B[Step 2: Live Interview Chat]
-        B --> C[Step 3: Results Dashboard + Roadmap]
+        B --> C[Step 3: Results & Roadmap]
+    end
+    subgraph Logic ["🧠 AI Agent Core"]
+        D[ParserAgent]
+        E[SkillExtractorAgent]
+        F[AssessmentAgent]
+        G[ScoringAgent]
+        H[BehavioralAgent]
+        I[GapAnalysisAgent]
+        J[LearningPlanAgent]
     end
 
-    subgraph Core ["🧠 Agent Orchestration (agents/)"]
-        D[ParserAgent\nResume + JD → ParsedDocument]
-        E[SkillExtractorAgent\nJD → ExtractedSkill list\nwith proficiency + weight]
-        F[AssessmentAgent\nAdaptive Q Generator\nSync + Async Streaming]
-        G[ScoringAgent\nEvidence-based 1-10 Scoring\nwith Confidence Metric]
-        H[BehavioralAgent\nSoft-skill Scoring\nClarity, Confidence, Conciseness]
-        I[GapAnalysisAgent\nDeterministic Math\npriority = weight × gap]
-        J[LearningPlanAgent\nWeek-by-Week Roadmap\nDocs + YouTube + Projects]
-        K[VisionEvaluatorAgent\nScreen-share Analysis\nPair-Programmer AI]
-    end
-
-    subgraph AILayer ["⚡ AI Orchestration Layer (utils/)"]
-        L[AIRouter\nParallel Key Racing\nasyncio.wait FIRST_COMPLETED]
-        M[KeyManager\nHealth Tracking\nCooldown + Rotation]
-        N[AICache\nDisk Cache 24hr TTL]
-        O[GeminiClient\ngemini-2.5-flash\nAsync + Streaming]
-        P[GroqClient\nllama-3.3-70b-versatile\nAsync + Streaming]
-    end
-
-    subgraph Config ["⚙️ Config (config/)"]
-        Q[Settings\npydantic-settings\n.env + Streamlit Secrets]
+    subgraph Infra ["⚡ AI Orchestration Layer"]
+        L[AIRouter]
+        M[KeyManager]
+        N[AICache]
+        O[GeminiClient]
+        P[GroqClient]
+        Q[Settings]
     end
 
     A --> D
@@ -133,7 +128,7 @@ flowchart TD
 | Technology | Why Chosen |
 |---|---|
 | **Streamlit 1.31+** | Enables a rich interactive web UI in pure Python. Native streaming support via `st.write_stream()` for real-time interview question generation |
-| **Custom CSS** | Neural Dark theme with glassmorphism cards, cyber-glow effects, and animated step indicators |
+| **Custom CSS** | Cyber Dark theme with glassmorphism cards, cyber-glow effects, and animated step indicators |
 | **Streamlit Components** | Used for custom stepper HTML with animated progress |
 
 ### AI / ML
@@ -143,20 +138,14 @@ flowchart TD
 | **Groq LLaMA 3.3 70B** | Automatic fallback. Groq's custom LPU hardware delivers ~500 tok/s — fastest inference available |
 | **Pydantic v2** | All AI outputs validated against strict schemas. Zero tolerance for hallucinated or malformed responses |
 
-### Backend / Infrastructure
+### Backend & Infrastructure
 | Technology | Why Chosen |
 |---|---|
 | **Python 3.12** | Latest stable. `asyncio` native support for true parallel key racing |
 | **FastAPI** | REST API layer for programmatic access to the assessment pipeline |
 | **PyMuPDF (fitz)** | High-fidelity PDF text extraction. More accurate than `pdfplumber` for dense technical resumes |
-| **pydantic-settings** | Type-safe configuration management. Reads from `.env` and Streamlit Secrets with zero boilerplate |
+| **Docker** | Containerized deployment. Includes `libmupdf-dev` for PDF support |
 | **diskcache** | Persistent disk-based caching with TTL. Prevents redundant AI calls for identical inputs |
-| **nest_asyncio** | Patches the running event loop in Streamlit's threaded environment to allow `asyncio.run()` calls |
-
-### DevOps
-| Technology | Why Chosen |
-|---|---|
-| **Docker + docker-compose** | Reproducible containerized deployment. Includes `libmupdf-dev` for PDF support |
 | **Streamlit Cloud** | Zero-config deployment with native Secrets management |
 
 ---
@@ -165,16 +154,16 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
-    participant U as 👤 User
-    participant UI as 🖥️ Streamlit UI
-    participant PA as 📄 ParserAgent
-    participant SE as 🔍 SkillExtractor
-    participant AA as 🎤 AssessmentAgent
-    participant SC as 📊 ScoringAgent
-    participant GA as 📐 GapAnalysis
-    participant LP as 🗺️ LearningPlan
-    participant AR as ⚡ AIRouter
-    participant KM as 🔑 KeyManager
+    participant U as ðŸ‘¤ User
+    participant UI as ðŸ–¥ï¸ Streamlit UI
+    participant PA as ðŸ“„ ParserAgent
+    participant SE as ðŸ” SkillExtractor
+    participant AA as ðŸŽ¤ AssessmentAgent
+    participant SC as ðŸ“Š ScoringAgent
+    participant GA as ðŸ“ GapAnalysis
+    participant LP as ðŸ—ºï¸ LearningPlan
+    participant AR as âš¡ AIRouter
+    participant KM as ðŸ”‘ KeyManager
 
     U->>UI: Upload Resume + JD (PDF/TXT)
     UI->>PA: parse_resume(text)
@@ -208,47 +197,44 @@ sequenceDiagram
 
 | Phase | Agent(s) | Output | Latency |
 |---|---|---|---|
-| **1. Document Parsing** | ParserAgent | Structured `ParsedDocument` (name, skills, experience) | ~1.5s |
-| **2. Skill Extraction** | SkillExtractorAgent | Weighted `ExtractedSkill` list from JD | ~1s |
-| **3. Adaptive Interview** | AssessmentAgent | Streamed technical questions per skill | Real-time |
-| **4. Skill Scoring** | ScoringAgent + BehavioralAgent | `SkillScore` (1–10) with reasoning + confidence | ~1s/skill |
-| **5. Gap Analysis** | GapAnalysisAgent | Priority-ranked `SkillGap` list | <50ms (deterministic) |
-| **6. Roadmap Generation** | LearningPlanAgent | `DetailedLearningPlan` with curated resources | ~3–5s |
+| **1. Setup** | Parser + Extractor | Parsed Documents + Weighted Skills | ~2.5s |
+| **2. Assessment** | Assessor + Scorer | Adaptive Questions + Evidence-based Scores | Real-time |
+| **3. Roadmap** | Analyzer + Planner | Gap Analysis + Weekly Mastery Plan | ~3.5s |
 
 ---
 
-## ✨ Features
+## âœ¨ Features
 
 ### Core Features
-- **📄 Multi-format Document Ingestion** — Upload PDF or TXT, or paste text directly for both Resume and Job Description
-- **🎯 Weighted Skill Extraction** — Reads the JD and assigns each skill a required proficiency (1–10) and an importance weight (1–5 critical)
-- **🎤 Adaptive Real-Time Interview** — Questions are generated dynamically and streamed token-by-token. Difficulty adapts based on conversation history
-- **📊 Evidence-Based Scoring** — Scores are never arbitrary. The AI cites specific things the candidate said (or failed to say) as evidence
-- **🔬 Behavioral Analysis Layer** — Separate AI agent evaluates communication clarity, answer conciseness, and perceived confidence
-- **📐 Deterministic Gap Prioritization** — `priority = importance_weight × (required_proficiency − actual_score)`. Pure math, fully auditable
+- **ðŸ“„ Multi-format Document Ingestion** â€” Upload PDF or TXT, or paste text directly for both Resume and Job Description
+- **ðŸŽ¯ Weighted Skill Extraction** â€” Reads the JD and assigns each skill a required proficiency (1â€“10) and an importance weight (1â€“5 critical)
+- **ðŸŽ¤ Adaptive Real-Time Interview** â€” Questions are generated dynamically and streamed token-by-token. Difficulty adapts based on conversation history
+- **ðŸ“Š Evidence-Based Scoring** â€” Scores are never arbitrary. The AI cites specific things the candidate said (or failed to say) as evidence
+- **ðŸ”¬ Behavioral Analysis Layer** â€” Separate AI agent evaluates communication clarity, answer conciseness, and perceived confidence
+- **ðŸ“ Deterministic Gap Prioritization** â€” `priority = importance_weight Ã— (required_proficiency âˆ’ actual_score)`. Pure math, fully auditable
 
 ### Advanced Features
-- **⚡ Parallel Key Racing** — 3 API keys are fired simultaneously using `asyncio.wait(FIRST_COMPLETED)`. The first response wins; others are cancelled. Eliminates rate-limit bottlenecks
-- **🔑 Intelligent Key Manager** — Tracks health of up to 50 keys per provider. Rate-limited keys enter a 60-second cooldown; random failures enter 10-second cooldown. LRU rotation ensures fair distribution
-- **🔄 Automatic Provider Failover** — If all Gemini keys fail, the router switches to Groq automatically
-- **💾 24-Hour Disk Cache** — Identical prompts return cached responses instantly, reducing cost and latency by up to 80% in repeated assessment sessions
-- **🗺️ Mastery Intelligence Blueprint** — The learning plan uses a 3-tier system: GAP skills (score 0–4) get 4 weeks of depth; DEVELOPING (5–7) get 2 weeks; STRONG (8–10) get zero (no busy work)
-- **📺 3-Level Video Curation** — Each week's plan includes Easy, Medium, and Hard YouTube resources with realistic time estimates
-- **👁️ Vision Evaluator (Experimental)** — Analyzes screen-share frames to detect what code the candidate is writing and suggest contextual follow-up questions
+- **âš¡ Parallel Key Racing** â€” 3 API keys are fired simultaneously using `asyncio.wait(FIRST_COMPLETED)`. The first response wins; others are cancelled. Eliminates rate-limit bottlenecks
+- **ðŸ”‘ Intelligent Key Manager** â€” Tracks health of up to 50 keys per provider. Rate-limited keys enter a 60-second cooldown; random failures enter 10-second cooldown. LRU rotation ensures fair distribution
+- **ðŸ”„ Automatic Provider Failover** â€” If all Gemini keys fail, the router switches to Groq automatically
+- **ðŸ’¾ 24-Hour Disk Cache** â€” Identical prompts return cached responses instantly, reducing cost and latency by up to 80% in repeated assessment sessions
+- **ðŸ—ºï¸ Mastery Intelligence Blueprint** â€” The learning plan uses a 3-tier system: GAP skills (score 0â€“4) get 4 weeks of depth; DEVELOPING (5â€“7) get 2 weeks; STRONG (8â€“10) get zero (no busy work)
+- **ðŸ“º 3-Level Video Curation** â€” Each week's plan includes Easy, Medium, and Hard YouTube resources with realistic time estimates
+- **ðŸ‘ï¸ Vision Evaluator (Experimental)** â€” Analyzes screen-share frames to detect what code the candidate is writing and suggest contextual follow-up questions
 
 ---
 
-## 📊 Performance & Benchmarks
+## ðŸ“Š Performance & Benchmarks
 
 ### AI Response Latency (Parallel Racing vs Sequential)
 
 ```mermaid
 xychart-beta
     title "P95 Latency: Sequential vs Parallel Key Racing"
-    x-axis ["Skill Parse", "Skill Score", "Gap Analysis", "Plan Gen"]
+    x-axis ["Phase 1: Setup", "Phase 2: Assessment", "Phase 3: Roadmap"]
     y-axis "Latency (ms)" 0 --> 6000
-    bar [4200, 3800, 45, 5100]
-    bar [1400, 1200, 45, 1800]
+    bar [4200, 3800, 5100]
+    bar [1400, 1200, 1800]
 ```
 
 > Blue = Sequential (single key) | Orange = Parallel Racing (3 keys)
@@ -257,11 +243,11 @@ xychart-beta
 
 ```mermaid
 graph LR
-    A[🟢 Expert 9-10] --> B[Deep-dive answers, no prompting needed]
-    C[🔵 Advanced 7-8] --> D[Correct with minor gaps]
-    E[🟡 Intermediate 5-6] --> F[Fundamentals solid, advanced missing]
-    G[🟠 Beginner 3-4] --> H[Surface level, cannot apply]
-    I[🔴 Novice 1-2] --> J[Cannot answer core questions]
+    A[ðŸŸ¢ Expert 9-10] --> B[Deep-dive answers, no prompting needed]
+    C[ðŸ”µ Advanced 7-8] --> D[Correct with minor gaps]
+    E[ðŸŸ¡ Intermediate 5-6] --> F[Fundamentals solid, advanced missing]
+    G[ðŸŸ  Beginner 3-4] --> H[Surface level, cannot apply]
+    I[ðŸ”´ Novice 1-2] --> J[Cannot answer core questions]
 ```
 
 ### Key Rotation Health Model
@@ -285,43 +271,43 @@ graph LR
   - Microservices   (Req: 8/10, Imp: 5/5)
 
 [3&4/6] Running Assessment & Scoring Engine...
-  Score for FastAPI : 0/10  (Conf: 0.90) — No practical knowledge demonstrated
-  Score for Docker  : 6/10  (Conf: 0.85) — Solid intermediate understanding
+  Score for FastAPI : 0/10  (Conf: 0.90) â€” No practical knowledge demonstrated
+  Score for Docker  : 6/10  (Conf: 0.85) â€” Solid intermediate understanding
 
 [5/6] Gap Analysis...
-  - Python          : Gap 8  (Priority: 40) ← highest priority
+  - Python          : Gap 8  (Priority: 40) â† highest priority
   - Microservices   : Gap 8  (Priority: 40)
   - SQL Databases   : Gap 7  (Priority: 35)
-  - Docker          : Gap 0  (Priority:  0) ← requirement met ✓
+  - Docker          : Gap 0  (Priority:  0) â† requirement met âœ“
 ```
 
 ---
 
-## 🧪 Demo / Screenshots
+## ðŸ§ª Demo / Screenshots
 
 > **Step 1 — Document Setup**
 > Upload a Job Description and Resume (PDF or paste text). The system accepts both formats without configuration.
 
-![Setup Screen](https://placehold.co/900x400/1e293b/7c3aed?text=Step+1%3A+Document+Upload+%26+Setup)
+![Setup Screen](assets/setup_screen.png)
 
 > **Step 2 — Live Adaptive Interview**
 > Questions are streamed in real-time. The AI reads prior answers and adapts the next question's difficulty accordingly.
 
-![Interview Screen](https://placehold.co/900x400/0f172a/06b6d4?text=Step+2%3A+Live+Adaptive+Technical+Interview)
+![Interview Screen](assets/interview_screen.png)
 
 > **Step 3 — Results Dashboard**
 > Skill-by-skill breakdown with scores, confidence levels, and AI reasoning. Includes behavioral analysis.
 
-![Dashboard Screen](https://placehold.co/900x400/0f172a/a78bfa?text=Step+3%3A+Skill+Scores+%26+Gap+Analysis+Dashboard)
+![Dashboard Screen](assets/dashboard_screen.png)
 
-> **Step 3 — Learning Roadmap**
-> Week-by-week roadmap per skill gap. Includes curated documentation links, 3-tier YouTube library, and buildable milestone projects.
+> **Step 4 — Personalized Learning Roadmap**
+> Week-by-week roadmap per skill gap. Includes curated documentation links, 3-tier video library, and buildable milestone projects.
 
-![Roadmap Screen](https://placehold.co/900x400/0f172a/f59e0b?text=Step+3%3A+Personalized+Learning+Roadmap)
+![Roadmap Screen](assets/roadmap_screen.png)
 
 ---
 
-## 🛠️ Installation & Setup
+## ðŸ› ï¸ Installation & Setup
 
 ### Prerequisites
 
@@ -392,61 +378,61 @@ python main.py
 
 ---
 
-## 📂 Project Structure
+## ðŸ“‚ Project Structure
 
 ```
 deccan/
-├── agents/                        # Specialized AI Agents
-│   ├── parser_agent.py            # Resume + JD → ParsedDocument (Pydantic)
-│   ├── skill_extractor.py         # JD → Weighted ExtractedSkill list
-│   ├── assessment_agent.py        # Adaptive question generator + async stream
-│   ├── scoring_agent.py           # Evidence-based 1-10 skill scorer
-│   ├── behavioral_agent.py        # Soft-skill evaluator (clarity, confidence)
-│   ├── gap_analysis_agent.py      # Deterministic gap prioritization math
-│   ├── learning_plan_agent.py     # Week-by-week roadmap generator
-│   └── vision_evaluator.py        # Screen-share / frame analysis (experimental)
-│
-├── utils/                         # Core Infrastructure
-│   ├── ai_router.py               # ⚡ Central AI orchestration (parallel racing)
-│   ├── ai_client.py               # GeminiClient + GroqClient (async ABC)
-│   ├── key_manager.py             # Multi-key health tracking + rotation
-│   ├── ai_cache.py                # Disk-based 24hr response cache
-│   ├── ai_structured.py           # JSON schema prompts + Pydantic parsing
-│   ├── ai_observability.py        # Logging + tracing hooks
-│   ├── ai_retry.py                # Tenacity retry decorators
-│   ├── document_parser.py         # PyMuPDF PDF text extraction
-│   ├── audio_parser.py            # Audio input parser (experimental)
-│   ├── live_stream_manager.py     # WebSocket live stream manager
-│   └── webhook_notifier.py        # Async webhook notifications
-│
-├── ui/                            # Streamlit Frontend
-│   ├── app.py                     # Main app router + session state machine
-│   ├── dashboard.py               # Results + gap analysis visualization
-│   ├── processing.py              # Loading/processing overlay screens
-│   └── style.css                  # Neural Dark theme + glassmorphism CSS
-│
-├── config/
-│   └── settings.py                # pydantic-settings config (env + Streamlit Secrets)
-│
-├── api/                           # FastAPI REST layer (programmatic access)
-├── main.py                        # CLI pipeline demo entry point
-├── requirements.txt               # Python dependencies
-├── Dockerfile                     # python:3.12-slim + libmupdf-dev
-├── docker-compose.yml             # Multi-service orchestration
-└── .env                           # API keys (never commit this)
+â”œâ”€â”€ agents/                        # Specialized AI Agents
+â”‚   â”œâ”€â”€ parser_agent.py            # Resume + JD â†’ ParsedDocument (Pydantic)
+â”‚   â”œâ”€â”€ skill_extractor.py         # JD â†’ Weighted ExtractedSkill list
+â”‚   â”œâ”€â”€ assessment_agent.py        # Adaptive question generator + async stream
+â”‚   â”œâ”€â”€ scoring_agent.py           # Evidence-based 1-10 skill scorer
+â”‚   â”œâ”€â”€ behavioral_agent.py        # Soft-skill evaluator (clarity, confidence)
+â”‚   â”œâ”€â”€ gap_analysis_agent.py      # Deterministic gap prioritization math
+â”‚   â”œâ”€â”€ learning_plan_agent.py     # Week-by-week roadmap generator
+â”‚   â””â”€â”€ vision_evaluator.py        # Screen-share / frame analysis (experimental)
+â”‚
+â”œâ”€â”€ utils/                         # Core Infrastructure
+â”‚   â”œâ”€â”€ ai_router.py               # âš¡ Central AI orchestration (parallel racing)
+â”‚   â”œâ”€â”€ ai_client.py               # GeminiClient + GroqClient (async ABC)
+â”‚   â”œâ”€â”€ key_manager.py             # Multi-key health tracking + rotation
+â”‚   â”œâ”€â”€ ai_cache.py                # Disk-based 24hr response cache
+â”‚   â”œâ”€â”€ ai_structured.py           # JSON schema prompts + Pydantic parsing
+â”‚   â”œâ”€â”€ ai_observability.py        # Logging + tracing hooks
+â”‚   â”œâ”€â”€ ai_retry.py                # Tenacity retry decorators
+â”‚   â”œâ”€â”€ document_parser.py         # PyMuPDF PDF text extraction
+â”‚   â”œâ”€â”€ audio_parser.py            # Audio input parser (experimental)
+â”‚   â”œâ”€â”€ live_stream_manager.py     # WebSocket live stream manager
+â”‚   â””â”€â”€ webhook_notifier.py        # Async webhook notifications
+â”‚
+â”œâ”€â”€ ui/                            # Streamlit Frontend
+â”‚   â”œâ”€â”€ app.py                     # Main app router + session state machine
+â”‚   â”œâ”€â”€ dashboard.py               # Results + gap analysis visualization
+â”‚   â”œâ”€â”€ processing.py              # Loading/processing overlay screens
+│   └── style.css                  # Cyber Dark theme + glassmorphism CSS
+â”‚
+â”œâ”€â”€ config/
+â”‚   â””â”€â”€ settings.py                # pydantic-settings config (env + Streamlit Secrets)
+â”‚
+â”œâ”€â”€ api/                           # FastAPI REST layer (programmatic access)
+â”œâ”€â”€ main.py                        # CLI pipeline demo entry point
+â”œâ”€â”€ requirements.txt               # Python dependencies
+â”œâ”€â”€ Dockerfile                     # python:3.12-slim + libmupdf-dev
+â”œâ”€â”€ docker-compose.yml             # Multi-service orchestration
+â””â”€â”€ .env                           # API keys (never commit this)
 ```
 
 ---
 
-## 🔐 API & Environment Variables
+## ðŸ” API & Environment Variables
 
 | Variable | Required | Description |
 |---|---|---|
 | `AI_PROVIDER` | No | `gemini` (default) or `groq` |
 | `GEMINI_API_KEY` | Yes* | Primary Google Gemini API key |
-| `GEMINI_API_KEY1` … `GEMINI_API_KEY29` | No | Additional keys for parallel racing (up to 30 total) |
+| `GEMINI_API_KEY1` â€¦ `GEMINI_API_KEY29` | No | Additional keys for parallel racing (up to 30 total) |
 | `GROQ_API_KEY` | Yes* | Primary Groq API key (fallback provider) |
-| `GROQ_API_KEY1` … `GROQ_API_KEY19` | No | Additional Groq keys (up to 20 total) |
+| `GROQ_API_KEY1` â€¦ `GROQ_API_KEY19` | No | Additional Groq keys (up to 20 total) |
 | `GEMINI_MODEL` | No | Gemini model ID (default: `gemini-2.5-flash`) |
 | `GROQ_MODEL` | No | Groq model ID (default: `llama-3.3-70b-versatile`) |
 | `CACHE_DIR` | No | Disk cache directory (default: `.cache`) |
@@ -455,19 +441,19 @@ deccan/
 > *At least one of `GEMINI_API_KEY` or `GROQ_API_KEY` is required.
 
 **Getting API Keys:**
-- **Gemini:** [Google AI Studio](https://aistudio.google.com/app/apikey) — Free tier available
-- **Groq:** [console.groq.com](https://console.groq.com) — Free tier with generous rate limits
+- **Gemini:** [Google AI Studio](https://aistudio.google.com/app/apikey) â€” Free tier available
+- **Groq:** [console.groq.com](https://console.groq.com) â€” Free tier with generous rate limits
 
 ---
 
-## 🚀 Deployment
+## ðŸš€ Deployment
 
-### Option 1: Streamlit Cloud (Recommended — Free)
+### Option 1: Streamlit Cloud (Recommended â€” Free)
 
 1. Push your code to GitHub
-2. Go to [share.streamlit.io](https://share.streamlit.io) → **New App**
+2. Go to [share.streamlit.io](https://share.streamlit.io) â†’ **New App**
 3. Select repository, set **Main file path:** `ui/app.py`
-4. Go to **Settings → Secrets** and add your API keys in TOML format:
+4. Go to **Settings â†’ Secrets** and add your API keys in TOML format:
 
 ```toml
 AI_PROVIDER = "gemini"
@@ -476,7 +462,7 @@ GEMINI_API_KEY1 = "your_second_key"
 GROQ_API_KEY = "your_groq_key"
 ```
 
-5. Deploy → Live in under 2 minutes.
+5. Deploy â†’ Live in under 2 minutes.
 
 ### Option 2: Docker (Self-Hosted)
 
@@ -505,22 +491,22 @@ Open port `8501` in your security group / firewall rules.
 
 ---
 
-## 📈 Future Improvements
+## ðŸ“ˆ Future Improvements
 
 | Feature | Description | Priority |
 |---|---|---|
-| **🎙️ Voice Interview Mode** | Replace text chat with real-time speech-to-text (Whisper API) + TTS for a fully voice-driven interview | High |
-| **📹 Live Vision Integration** | Connect `VisionEvaluatorAgent` to browser screen-share via WebRTC. AI pair-programmer watches the candidate code in real-time | High |
-| **🏢 Recruiter Dashboard** | Multi-candidate comparison view with exportable PDF reports and ATS integration (Greenhouse, Lever) | High |
-| **📊 Longitudinal Tracking** | Store candidate assessments over time. Track skill progression across multiple interviews | Medium |
-| **🤖 Multi-Agent Debate** | Two specialized AI agents debate the candidate's answers from different technical perspectives before arriving at a consensus score | Medium |
-| **⚖️ Bias Auditing Layer** | Statistical analysis of scores across demographics to detect and flag potential AI bias patterns | Medium |
-| **🌐 Multi-Language Support** | Conduct interviews in any language; generate roadmaps with localized resources | Low |
-| **🔌 Webhook Integrations** | Push assessment results directly to Slack, Notion, or custom HR systems via the existing `webhook_notifier.py` infrastructure | Low |
+| **ðŸŽ™ï¸ Voice Interview Mode** | Replace text chat with real-time speech-to-text (Whisper API) + TTS for a fully voice-driven interview | High |
+| **ðŸ“¹ Live Vision Integration** | Connect `VisionEvaluatorAgent` to browser screen-share via WebRTC. AI pair-programmer watches the candidate code in real-time | High |
+| **ðŸ¢ Recruiter Dashboard** | Multi-candidate comparison view with exportable PDF reports and ATS integration (Greenhouse, Lever) | High |
+| **ðŸ“Š Longitudinal Tracking** | Store candidate assessments over time. Track skill progression across multiple interviews | Medium |
+| **ðŸ¤– Multi-Agent Debate** | Two specialized AI agents debate the candidate's answers from different technical perspectives before arriving at a consensus score | Medium |
+| **âš–ï¸ Bias Auditing Layer** | Statistical analysis of scores across demographics to detect and flag potential AI bias patterns | Medium |
+| **ðŸŒ Multi-Language Support** | Conduct interviews in any language; generate roadmaps with localized resources | Low |
+| **ðŸ”Œ Webhook Integrations** | Push assessment results directly to Slack, Notion, or custom HR systems via the existing `webhook_notifier.py` infrastructure | Low |
 
 ---
 
-## 🤝 Contributing
+## ðŸ¤ Contributing
 
 Contributions are welcome and encouraged!
 
@@ -537,7 +523,7 @@ pip install -r requirements.txt
 
 1. **Fork** the repository
 2. **Create** a feature branch: `git checkout -b feature/your-feature-name`
-3. **Write clean, type-hinted Python** — all new agents must use Pydantic models for I/O
+3. **Write clean, type-hinted Python** â€” all new agents must use Pydantic models for I/O
 4. **Test your agent** by adding a section to `main.py`
 5. **Commit** with a descriptive message: `git commit -m "feat: add VoiceInterviewAgent with Whisper integration"`
 6. **Open a Pull Request** with a clear description of the change and its motivation
@@ -570,14 +556,14 @@ The `ai_router` handles all complexity: key selection, parallel racing, caching,
 
 ---
 
-## 📜 License
+## ðŸ“œ License
 
 This project is licensed under the **MIT License**.
 
 ```
 MIT License
 
-Copyright (c) 2026 NeuralHire Contributors
+Copyright (c) 2026 AI Skill Assessment Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -598,8 +584,9 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 <div align="center">
 
-**Built with ❤️ by the NeuralHire Team**
+**Built with â¤ï¸ by the AI Skill Assessment Team**
 
-*Powered by Gemini 2.5 Flash · Groq LLaMA 3.3 · Pydantic v2 · Streamlit*
+*Powered by Gemini 2.5 Flash Â· Groq LLaMA 3.3 Â· Pydantic v2 Â· Streamlit*
 
 </div>
+

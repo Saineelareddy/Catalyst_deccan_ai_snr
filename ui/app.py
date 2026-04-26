@@ -313,9 +313,9 @@ elif st.session_state.current_step == 2:
             
             for skill_idx, (itab, skill) in enumerate(zip(inner_tabs, skills_with_plans)):
                 with itab:
-                    # Neural Feedback Header (Premium Style)
+                    # AI Feedback Header (Premium Style)
                     st.markdown(f"""<div class="glass-box" style="margin-bottom: 4rem; border-left: 4px solid var(--primary-cyan);">
-<div class="box-label">◈ NEURAL SYSTEM INSIGHT</div>
+<div class="box-label">◈ AI SYSTEM INSIGHT</div>
 <div style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: white; line-height: 1.6; font-weight: 400;">{skill.candidate_feedback}</div>
 </div>""", unsafe_allow_html=True)
 
@@ -375,7 +375,7 @@ elif st.session_state.current_step == 2:
 </div>
 
 <div style="display:flex; flex-direction:column; gap:20px;">
-<div class="box-label" style="padding-left:10px;">◈ NEURAL VIDEO LIBRARY</div>
+<div class="box-label" style="padding-left:10px;">◈ AI VIDEO LIBRARY</div>
 {get_video_html(week.youtube.easy, 'easy')}
 {get_video_html(week.youtube.medium, 'medium')}
 {get_video_html(week.youtube.hard, 'hard')}

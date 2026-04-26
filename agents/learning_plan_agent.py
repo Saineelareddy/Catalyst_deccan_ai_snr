@@ -67,7 +67,7 @@ class DetailedLearningPlan(BaseModel):
 
 # ─── System Prompt ────────────────────────────────────────────────────────────
 
-SYSTEM_PROMPT = """You are an expert curriculum designer and senior engineer for NeuralHire.
+SYSTEM_PROMPT = """You are an expert curriculum designer and senior engineer.
 
 Generate a MASTERY INTELLIGENCE BLUEPRINT as structured JSON data.
 
@@ -77,7 +77,7 @@ CORE LOGIC:
 - STRONG skills (Score 8-10): Provide 0 weeks (Mastery). color: "green", category: "STRONG", topics: []
 
 RULES:
-1. NEURAL QUALITY: Every 'candidate_feedback' must be unique. Reference their specific performance. 
+1. HIGH QUALITY: Every 'candidate_feedback' must be unique. Reference their specific performance. 
    - If they did well, tell them why. 
    - If they struggled, identify the specific concept they missed.
 2. ADJACENT SKILLS: Identify 'Leverage Points' where one skill unlocks another.

@@ -10,7 +10,7 @@ def render_results_dashboard(assessment_data: dict, plan) -> None:
     Uses Plotly for high-fidelity charts and custom CSS for glassmorphism.
     """
     
-    # 1. Inject Neural CSS
+    # 1. Inject AI Dashboard CSS
     st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
@@ -19,12 +19,12 @@ def render_results_dashboard(assessment_data: dict, plan) -> None:
         font-family: 'Outfit', sans-serif;
     }
     
-    .neural-header {
+    .assessment-header {
         margin-bottom: 3rem;
         padding-top: 1rem;
     }
     
-    .h1-neural {
+    .h1-assessment {
         font-size: 3.5rem;
         font-weight: 800;
         background: linear-gradient(135deg, #f8fafc 30%, #94a3b8 100%);
@@ -99,14 +99,14 @@ def render_results_dashboard(assessment_data: dict, plan) -> None:
     # 2. Header Section
     col_h1, col_h2 = st.columns([2, 1])
     with col_h1:
-        st.markdown(f'<div class="blueprint-subtitle">NeuralHire // Mastery Intelligence Blueprint</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="h1-neural">{plan.candidate_name}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="blueprint-subtitle">AI Skill Assessment // Mastery Roadmap</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="h1-assessment">{plan.candidate_name}</div>', unsafe_allow_html=True)
         st.markdown(f'<div style="color:#94a3b8; font-size:1.1rem;">Targeting <b>{plan.target_role}</b> readiness</div>', unsafe_allow_html=True)
     
     with col_h2:
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("📥 EXPORT INTELLIGENCE PDF", use_container_width=True, key="btn_export_pdf"):
-             st.toast("Generating Neural Blueprint PDF...", icon="🧠")
+             st.toast("Generating Assessment Report PDF...", icon="🧠")
     
     # 3. Intelligence Metrics Row
     st.markdown("<br>", unsafe_allow_html=True)
@@ -123,7 +123,7 @@ def render_results_dashboard(assessment_data: dict, plan) -> None:
     with m3:
         st.markdown(f'<div class="glass-card"><div class="metric-val" style="color:#7c3aed">{weeks}</div><div class="metric-lbl">Weeks to Mastery</div></div>', unsafe_allow_html=True)
     with m4:
-        st.markdown(f'<div class="glass-card"><div class="metric-val" style="color:#22c55e">DNA</div><div class="metric-lbl">Neural Signature</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="glass-card"><div class="metric-val" style="color:#22c55e">DNA</div><div class="metric-lbl">Assessment Signature</div></div>', unsafe_allow_html=True)
 
     # 4. Competency Map (Radar) & Intelligence Synthesis
     c1, c2 = st.columns([1, 1])
@@ -212,7 +212,7 @@ def render_results_dashboard(assessment_data: dict, plan) -> None:
     cols[0].markdown("**Skill**")
     cols[1].markdown("**Level**")
     cols[2].markdown("**Gap**")
-    cols[3].markdown("**Neural Status**")
+    cols[3].markdown("**Assessment Status**")
     
     for s in plan.skills:
         scol = st.columns([3, 1, 1, 2])
