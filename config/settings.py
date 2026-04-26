@@ -34,30 +34,51 @@ class Settings(BaseSettings):
 
     def __init__(self, **values):
         super().__init__(**values)
-        # Collect all numbered keys from environment
         import os
         from dotenv import load_dotenv
-        load_dotenv() # Ensure we have latest from .env
+        load_dotenv() 
         
+        # Streamlit Secrets Support
+        st_secrets = {}
+        try:
+            import streamlit as st
+            st_secrets = st.secrets
+        except:
+            pass
+
+        def get_sec(key, default=None):
+            # Try Streamlit Secrets first, then OS Env
+            val = st_secrets.get(key)
+            if val is not None: return val
+            return os.getenv(key, default)
+
         # Collect Gemini keys
         self.gemini_api_keys = []
-        if self.gemini_api_key:
-            self.gemini_api_keys.append(self.gemini_api_key)
+        # Check primary key
+        pk = get_sec("GEMINI_API_KEY")
+        if pk: 
+            self.gemini_api_key = pk
+            self.gemini_api_keys.append(pk)
         
-        for i in range(1, 20): # Check up to 20 keys
-            key = os.getenv(f"GEMINI_API_KEY{i}")
+        for i in range(1, 30): # Check up to 30 keys
+            key = get_sec(f"GEMINI_API_KEY{i}")
             if key and key not in self.gemini_api_keys:
                 self.gemini_api_keys.append(key)
                 
         # Collect Groq keys
         self.groq_api_keys = []
-        if self.groq_api_key:
-            self.groq_api_keys.append(self.groq_api_key)
+        pk_groq = get_sec("GROQ_API_KEY")
+        if pk_groq:
+            self.groq_api_key = pk_groq
+            self.groq_api_keys.append(pk_groq)
             
         for i in range(1, 20):
-            key = os.getenv(f"GROQ_API_KEY{i}")
+            key = get_sec(f"GROQ_API_KEY{i}")
             if key and key not in self.groq_api_keys:
                 self.groq_api_keys.append(key)
+
+        if not self.gemini_api_keys and not self.groq_api_keys:
+            print("⚠️ WARNING: No API keys found in Environment or Streamlit Secrets!")
 
 # Global settings instance
 settings = Settings()

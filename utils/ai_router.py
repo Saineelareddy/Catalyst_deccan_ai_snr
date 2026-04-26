@@ -100,7 +100,13 @@ class AIRouter:
         # 3. Final Fallback
         if last_exception:
             raise last_exception
-        raise RuntimeError(f"All {max_attempts} parallel racing attempts failed for {provider}.")
+        
+        msg = f"All {max_attempts} parallel racing attempts failed for {provider}."
+        if not key_manager.keys.get(provider):
+            msg += " REASON: No API keys were loaded for this provider."
+        else:
+            msg += " REASON: All available keys are currently in cooldown (rate limited)."
+        raise RuntimeError(msg)
 
     async def _execute_with_key(self, client, prompt, system_prompt, key, provider):
         """Helper to execute and report to key manager."""
