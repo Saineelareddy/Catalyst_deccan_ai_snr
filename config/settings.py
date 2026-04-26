@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     ai_provider: Literal["gemini", "groq"] = "gemini"
     gemini_api_key: Optional[str] = None   # single primary key (alias)
     groq_api_key: Optional[str] = None     # single primary key (alias)
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-1.5-flash"   # 1500 RPD free tier (vs 20 for 2.5/3.x)
     groq_model: str = "llama-3.3-70b-versatile"
     cache_dir: str = ".cache"
     cache_expiration_seconds: int = 86400

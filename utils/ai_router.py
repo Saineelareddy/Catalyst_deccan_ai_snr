@@ -28,85 +28,92 @@ class AIRouter:
             "groq": GroqClient()
         }
 
-    async def acomplete(self, 
-                       prompt: str, 
-                       system_prompt: Optional[str] = None, 
-                       response_model: Optional[Type[T]] = None, 
+    async def acomplete(self,
+                       prompt: str,
+                       system_prompt: Optional[str] = None,
+                       response_model: Optional[Type[T]] = None,
                        parallel_count: int = 3,
                        max_attempts: int = 3,
                        bypass_cache: bool = False) -> str | T:
         """
-        Asynchronously completes a request, racing multiple API keys in parallel.
-        Implements robust retry logic across batches of keys.
+        Asynchronously completes a request.
+        - Races multiple API keys in parallel per provider.
+        - On full exhaustion of primary provider, automatically falls back
+          to the secondary provider (Gemini → Groq or Groq → Gemini).
         """
         if response_model:
             schema_instruction = generate_schema_prompt(response_model)
             system_prompt = f"{system_prompt}\n\n{schema_instruction}" if system_prompt else schema_instruction
 
-        provider = settings.ai_provider
-        client = self.clients.get(provider)
-        if not client:
-            raise ValueError(f"Provider {provider} not supported.")
+        primary_provider = settings.ai_provider
+        # Build the ordered list of providers to try
+        all_providers = [primary_provider]
+        fallback = "groq" if primary_provider == "gemini" else "gemini"
+        if key_manager.keys.get(fallback):  # only add if we have fallback keys
+            all_providers.append(fallback)
 
-        # 1. Cache Check
-        cache_key = get_cache_key(provider, client.model, prompt, system_prompt)
-        if not bypass_cache:
-            cached = get_cached_response(cache_key)
-            if cached:
-                logger.info("Cache hit.")
-                return parse_structured_response(cached, response_model) if response_model else cached
+        for provider in all_providers:
+            client = self.clients.get(provider)
+            if not client:
+                continue
 
-        # 2. Robust Parallel Racing with Batch Retries
-        last_exception = None
-        
-        for attempt in range(max_attempts):
-            keys = key_manager.get_best_keys(provider, count=parallel_count)
-            if not keys:
-                logger.error(f"No available keys for {provider} on attempt {attempt+1}")
-                break
+            # Cache check (only on primary provider)
+            if provider == primary_provider:
+                cache_key = get_cache_key(provider, client.model, prompt, system_prompt)
+                if not bypass_cache:
+                    cached = get_cached_response(cache_key)
+                    if cached:
+                        logger.info("Cache hit.")
+                        return parse_structured_response(cached, response_model) if response_model else cached
+            else:
+                cache_key = None
+                logger.warning(f"⚡ PRIMARY PROVIDER EXHAUSTED — falling back to {provider.upper()}")
 
-            logger.info(f"Attempt {attempt+1}/{max_attempts}: Racing {len(keys)} keys in parallel for {provider}...")
-            
-            tasks = [asyncio.create_task(self._execute_with_key(client, prompt, system_prompt, key, provider)) for key in keys]
-            
-            # Proper racing: wait for first success, skip failures
-            pending = set(tasks)
-            while pending:
-                done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
-                
-                for task in done:
-                    try:
-                        key, response_text = task.result()
-                        # SUCCESS: Clean up and return
-                        for t in pending:
-                            t.cancel()
-                        
-                        key_manager.report_success(provider, key)
-                        
-                        if not bypass_cache:
-                            set_cached_response(cache_key, response_text)
+            last_exception = None
+            succeeded = False
 
-                        if response_model:
-                            return parse_structured_response(response_text, response_model)
-                        return response_text
-                    except Exception as e:
-                        # FAILURE: Log and continue with remaining tasks in this batch
-                        logger.warning(f"Key failed: {str(e)[:100]}...")
-                        last_exception = e
-            
-            # If we get here, all tasks in this batch failed
-            logger.warning(f"All keys in attempt {attempt+1} failed. Trying next batch...")
+            for attempt in range(max_attempts):
+                keys = key_manager.get_best_keys(provider, count=parallel_count)
+                if not keys:
+                    logger.error(f"No available keys for {provider} on attempt {attempt+1}")
+                    break
 
-        # 3. Final Fallback
-        if last_exception:
-            raise last_exception
-        
-        msg = f"All {max_attempts} parallel racing attempts failed for {provider}."
-        if not key_manager.keys.get(provider):
-            msg += " REASON: No API keys were loaded for this provider."
-        else:
-            msg += " REASON: All available keys are currently in cooldown (rate limited)."
-        raise RuntimeError(msg)
+                logger.info(f"[{provider}] Attempt {attempt+1}/{max_attempts}: Racing {len(keys)} keys...")
+
+                tasks = [
+                    asyncio.create_task(
+                        self._execute_with_key(client, prompt, system_prompt, key, provider)
+                    ) for key in keys
+                ]
+
+                pending = set(tasks)
+                while pending:
+                    done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
+                    for task in done:
+                        try:
+                            key, response_text = task.result()
+                            for t in pending:
+                                t.cancel()
+                            key_manager.report_success(provider, key)
+                            if cache_key and not bypass_cache:
+                                set_cached_response(cache_key, response_text)
+                            if response_model:
+                                return parse_structured_response(response_text, response_model)
+                            return response_text
+                        except Exception as e:
+                            logger.warning(f"[{provider}] Key failed: {str(e)[:120]}")
+                            last_exception = e
+
+                logger.warning(f"[{provider}] All keys in attempt {attempt+1} failed.")
+
+            if not succeeded:
+                logger.error(f"[{provider}] ALL {max_attempts} attempts failed. Moving to next provider...")
+
+        # All providers exhausted
+        raise RuntimeError(
+            f"ALL PROVIDERS EXHAUSTED. Last error: {last_exception}. "
+            "Check your API keys and rate limits."
+        )
 
     async def _execute_with_key(self, client, prompt, system_prompt, key, provider):
         """Helper to execute and report to key manager."""
