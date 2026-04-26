@@ -1,5 +1,6 @@
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
 from typing import Literal, List, Optional
 
 class Settings(BaseSettings):
@@ -22,6 +23,16 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore"
     )
+
+    @field_validator('gemini_api_keys', 'groq_api_keys', mode='before')
+    @classmethod
+    def parse_key_list(cls, v):
+        """Accept both CSV strings ('k1,k2,k3') and actual lists."""
+        if isinstance(v, str):
+            return [k.strip() for k in v.split(',') if k.strip()]
+        if isinstance(v, list):
+            return [str(k).strip() for k in v if str(k).strip()]
+        return []
 
     def __init__(self, **values):
         super().__init__(**values)
