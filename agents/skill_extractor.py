@@ -9,7 +9,7 @@ class ExtractedSkill(BaseModel):
     context: Optional[Any] = ""
 
 class JDSkillsExtraction(BaseModel):
-    skills: List[Dict[str, Any]] = Field(default=[])
+    skills: List[ExtractedSkill] = Field(default=[])
 
 class SkillExtractorAgent:
     """
