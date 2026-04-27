@@ -4,10 +4,10 @@ from typing import Type, TypeVar, Any, Optional, AsyncGenerator, List
 from pydantic import BaseModel
 
 from config.settings import settings
-from utils.ai_client import GeminiClient, GroqClient
-from utils.ai_cache import get_cache_key, get_cached_response, set_cached_response
-from utils.ai_structured import generate_schema_prompt, parse_structured_response
-from utils.key_manager import key_manager
+from .ai_client import GeminiClient, GroqClient
+from .ai_cache import get_cache_key, get_cached_response, set_cached_response
+from .ai_structured import generate_schema_prompt, parse_structured_response
+from .key_manager import key_manager
 
 logger = logging.getLogger("AIRouter")
 
