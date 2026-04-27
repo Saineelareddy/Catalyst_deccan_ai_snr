@@ -113,6 +113,18 @@ class AIRouter:
             logger.error(f"[{provider}] All keys exhausted.")
 
         # All providers and all keys failed
+        error_msg = str(last_exception)
+        if "rate limit" in error_msg.lower() or "429" in error_msg:
+             friendly_msg = (
+                 "🚨 API RATE LIMIT REACHED: All available API keys (Gemini & Groq) are currently exhausted or cooling down.\n\n"
+                 f"Detail: {error_msg}\n\n"
+                 "HOW TO FIX:\n"
+                 "1. Wait a few minutes (usually 1-3 mins) and try again.\n"
+                 "2. Add more API keys to your Streamlit Secrets (GEMINI_API_KEY1, GEMINI_API_KEY2, etc.).\n"
+                 "3. Check your token usage at https://aistudio.google.com/ and https://console.groq.com/."
+             )
+             raise RuntimeError(friendly_msg)
+             
         raise RuntimeError(
             f"ALL PROVIDERS EXHAUSTED. Last error: {last_exception}. "
             "Check your API keys and rate limits in Streamlit Secrets."
