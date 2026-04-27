@@ -46,25 +46,29 @@ def local_css(file_name):
 
 local_css("ui/style.css")
 
-# Initialize agents
+@st.cache_resource
 def get_agents():
-    return {
-        "parser": ParserAgent(),
-        "extractor": SkillExtractorAgent(),
-        "assessor": AssessmentAgent(),
-        "scorer": ScoringAgent(),
-        "analyzer": GapAnalysisAgent(),
-        "planner": LearningPlanAgent()
-    }
+    try:
+        return {
+            "parser": ParserAgent(),
+            "extractor": SkillExtractorAgent(),
+            "assessor": AssessmentAgent(),
+            "scorer": ScoringAgent(),
+            "analyzer": GapAnalysisAgent(),
+            "planner": LearningPlanAgent()
+        }
+    except Exception as e:
+        st.error(f"Critical Error: Failed to initialize AI Agents. {e}")
+        return None
 
-try:
-    agents = get_agents()
-except Exception as e:
-    st.error(f"Failed to initialize agents: {e}")
-    st.exception(e)
+agents = get_agents()
+
+if not agents:
+    st.warning("⚠️ The AI system could not be initialized. Please check your API keys in the settings.")
     st.stop()
 
 st.title("AI-Powered Skill Assessment & Learning Plan")
+st.success("✅ System Ready")
 
 # State Management
 if "setup_complete" not in st.session_state:
