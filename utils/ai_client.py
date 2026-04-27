@@ -26,13 +26,13 @@ class BaseAIClient(abc.ABC):
 class GeminiClient(BaseAIClient):
     def __init__(self, model: str = settings.gemini_model):
         super().__init__(model)
-        from google import genai
-        # We don't initialize a single client because we want to support multiple keys in parallel
+        self._clients = {} # Cache clients by API key
+
     def _get_client(self, api_key: str):
-        from google import genai
-        # Always return a new client to avoid 'Event loop is closed' errors 
-        # when running in threaded environments like Streamlit.
-        return genai.Client(api_key=api_key)
+        if api_key not in self._clients:
+            from google import genai
+            self._clients[api_key] = genai.Client(api_key=api_key)
+        return self._clients[api_key]
 
     async def acomplete(self, prompt: str, system_prompt: Optional[str] = None, api_key: Optional[str] = None) -> str:
         if not api_key:
@@ -78,11 +78,13 @@ class GeminiClient(BaseAIClient):
 class GroqClient(BaseAIClient):
     def __init__(self, model: str = settings.groq_model):
         super().__init__(model)
+        self._clients = {} # Cache clients by API key
+
     def _get_client(self, api_key: str):
-        from groq import AsyncGroq
-        # Always return a new client to avoid 'Event loop is closed' errors 
-        # when running in threaded environments like Streamlit.
-        return AsyncGroq(api_key=api_key)
+        if api_key not in self._clients:
+            from groq import AsyncGroq
+            self._clients[api_key] = AsyncGroq(api_key=api_key)
+        return self._clients[api_key]
 
     async def acomplete(self, prompt: str, system_prompt: Optional[str] = None, api_key: Optional[str] = None) -> str:
         if not api_key:

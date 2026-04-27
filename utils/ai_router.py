@@ -106,6 +106,8 @@ class AIRouter:
                     key_manager.report_failure(provider, key, err_str)
                     last_exception = e
                     logger.warning(f"[{provider}] Key {key[:8]}... failed: {err_str[:100]}")
+                    # Small sleep to prevent rapid-fire burning of keys
+                    await asyncio.sleep(1)
                     # Continue to next key
 
             logger.error(f"[{provider}] All keys exhausted.")
@@ -154,16 +156,25 @@ class AIRouter:
             try:
                 loop = asyncio.get_running_loop()
             except RuntimeError:
+                # No loop running, simple asyncio.run
                 return asyncio.run(self.acomplete(*args, **kwargs))
+            
+            # If loop is running, we MUST use nest_asyncio to run until complete
+            if loop.is_running():
+                import nest_asyncio
+                nest_asyncio.apply()
+                return loop.run_until_complete(self.acomplete(*args, **kwargs))
             else:
-                if loop.is_running():
-                    import nest_asyncio
-                    nest_asyncio.apply()
-                    return loop.run_until_complete(self.acomplete(*args, **kwargs))
                 return asyncio.run(self.acomplete(*args, **kwargs))
-        except asyncio.CancelledError:
-            logger.warning("Sync operation cancelled.")
-            return None
+        except Exception as e:
+            if "Event loop is closed" in str(e):
+                # Critical fallback: If the loop is closed, try to force a new one
+                # This is rare but happens in some Streamlit environments
+                new_loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(new_loop)
+                return new_loop.run_until_complete(self.acomplete(*args, **kwargs))
+            logger.error(f"Sync complete failed: {e}")
+            raise
 
 
 # Global router instance

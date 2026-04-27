@@ -2,10 +2,14 @@ import streamlit as st
 import os
 import time
 import sys
+import nest_asyncio
 from dotenv import load_dotenv
 
 # MUST BE THE FIRST STREAMLIT CALL
 st.set_page_config(page_title="AI Skill Assessment", layout="wide")
+
+# Enable nested asyncio loops for Streamlit/Async compatibility
+nest_asyncio.apply()
 
 # Ensure we have utils.ai_structured registered early in sys.modules 
 # to avoid Pydantic KeyError during hot-reloads
