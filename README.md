@@ -1,5 +1,7 @@
 # 🚀 AI SKILL ASSESSMENT ENGINE
+### [Live Deployment](https://catalyst-deccan-ai-snr.streamlit.app/)
 ### The Autonomous Technical Interview & Personalized Mastery Platform
+
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.31+-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
@@ -174,6 +176,10 @@ graph LR
 ---
 
 ## 🧪 Demo / Screenshots
+
+### 🎥 Demo Video
+[Watch the Demo Video Here](https://drive.google.com/file/d/1Q6d5moI-_k_6nOw47Bl91wMEeEe0wqt9/view?usp=sharing)
+
 
 | Step 1: Upload | Step 2: Adaptive Interview | Step 3: Results |
 | :--- | :--- | :--- |
