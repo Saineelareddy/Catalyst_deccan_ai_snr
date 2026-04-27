@@ -3,6 +3,8 @@ import os
 import time
 import sys
 import nest_asyncio
+import traceback
+import asyncio
 from dotenv import load_dotenv
 
 # MUST BE THE FIRST STREAMLIT CALL
@@ -10,10 +12,6 @@ st.set_page_config(page_title="AI Skill Assessment", layout="wide")
 
 # Enable nested asyncio loops for Streamlit/Async compatibility
 nest_asyncio.apply()
-
-# Ensure we have utils.ai_structured registered early in sys.modules 
-# to avoid Pydantic KeyError during hot-reloads
-import utils.ai_structured 
 
 # Ensure we load env before imports
 load_dotenv()
@@ -50,7 +48,7 @@ def local_css(file_name):
 
 local_css("ui/style.css")
 
-# Initialize agents
+# Initialize agents safely
 def get_agents():
     try:
         return {
@@ -62,16 +60,20 @@ def get_agents():
             "planner": LearningPlanAgent()
         }
     except Exception as e:
-        st.error(f"Critical Error: Failed to initialize AI Agents. {e}")
+        st.error(f"Critical Error: Failed to initialize AI Agents.")
+        st.exception(e)
         return None
 
-if "agents" not in st.session_state:
+if "agents" not in st.session_state or st.session_state.agents is None:
     st.session_state.agents = get_agents()
 
-agents = st.session_state.agents
+agents_pool = st.session_state.get("agents")
 
-if not agents:
-    st.warning("⚠️ The AI system could not be initialized. Please check your API keys in the settings.")
+if not agents_pool:
+    st.warning("⚠️ The AI system could not be initialized. Please check your API keys and configuration.")
+    if st.button("🔄 Try Re-initializing System"):
+        st.session_state.agents = get_agents()
+        st.rerun()
     st.stop()
 
 st.title("AI-Powered Skill Assessment & Learning Plan")
@@ -137,33 +139,41 @@ if st.session_state.processing_phase:
     
     # Perform the actual work while the gears spin
     if phase == "setup_to_assessment":
-        # 1. Parse Resume & Skills
-        st.session_state.parsed_resume = st.session_state.agents["parser"].parse_resume(st.session_state.temp_resume_text)
-        st.session_state.jd_skills = st.session_state.agents["extractor"].extract_skills(st.session_state.temp_jd_text).skills
-        
-        # 2. Init Chat
-        st.session_state.chat_history = {}
-        for skill in st.session_state.jd_skills:
-            st.session_state.chat_history[skill.skill_name] = []
-        
-        st.session_state.setup_complete = True
-        st.session_state.current_skill_index = 0
-        st.session_state.actual_scores = []
-        st.session_state.assessment_complete = False
-        
-        time.sleep(1) # Small buffer
-        st.session_state.processing_phase = None
-        st.session_state.current_step = 1
-        st.rerun()
+        try:
+            # 1. Parse Resume & Skills
+            st.session_state.parsed_resume = agents_pool["parser"].parse_resume(st.session_state.temp_resume_text)
+            st.session_state.jd_skills = agents_pool["extractor"].extract_skills(st.session_state.temp_jd_text).skills
+            
+            # 2. Init Chat
+            st.session_state.chat_history = {}
+            for skill in st.session_state.jd_skills:
+                st.session_state.chat_history[skill.skill_name] = []
+            
+            st.session_state.setup_complete = True
+            st.session_state.current_skill_index = 0
+            st.session_state.actual_scores = []
+            st.session_state.assessment_complete = False
+            
+            time.sleep(1) # Small buffer
+            st.session_state.processing_phase = None
+            st.session_state.current_step = 1
+            st.rerun()
+        except Exception as e:
+            st.error(f"Processing Error: {e}")
+            st.exception(e)
+            st.session_state.processing_phase = None
+            if st.button("Back to Setup"):
+                st.rerun()
+            st.stop()
         
     elif phase == "assessment_to_plan":
         # Final Scoring & Planning
-        gaps = st.session_state.agents["analyzer"].analyze_gaps(st.session_state.jd_skills, st.session_state.actual_scores)
+        gaps = agents_pool["analyzer"].analyze_gaps(st.session_state.jd_skills, st.session_state.actual_scores)
         name = getattr(st.session_state.parsed_resume, "name", "Candidate") or "Candidate"
         
         # Parallel Racing in background
         import asyncio
-        st.session_state.learning_plan = asyncio.run(st.session_state.agents["planner"].agenerate_plan(gaps, candidate_name=name))
+        st.session_state.learning_plan = asyncio.run(agents_pool["planner"].agenerate_plan(gaps, candidate_name=name))
         
         time.sleep(1) # Small buffer
         st.session_state.processing_phase = None
@@ -252,25 +262,28 @@ elif st.session_state.current_step == 1:
         # Generate question if AI's turn
         if len(history) == 0 or history[-1]["role"] == "candidate":
             with st.chat_message("assistant"):
-                import asyncio
-                
                 def get_stream():
                     # Helper to run async gen in sync streamlit
-                    gen = st.session_state.agents["assessor"].astream_question(
+                    # Simplified to avoid manual loop management
+                    gen = agents_pool["assessor"].astream_question(
                         current_skill.skill_name, 
                         current_skill.required_proficiency, 
                         str(st.session_state.parsed_resume.experience), 
                         history
                     )
-                    loop = asyncio.new_event_loop()
+                    
                     try:
-                        while True:
-                            try:
-                                yield loop.run_until_complete(gen.__anext__())
-                            except StopAsyncIteration:
-                                break
-                    finally:
-                        loop.close()
+                        loop = asyncio.get_event_loop()
+                    except RuntimeError:
+                        loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(loop)
+                        
+                    iterator = gen.__aiter__()
+                    while True:
+                        try:
+                            yield loop.run_until_complete(iterator.__anext__())
+                        except StopAsyncIteration:
+                            break
 
                 full_q = st.write_stream(get_stream())
                 history.append({"role": "interviewer", "content": full_q})
@@ -294,7 +307,7 @@ elif st.session_state.current_step == 1:
         if len(history) >= 2: # At least one Q&A pair
             if c_next.button("Finish this Skill & Evaluate", key="btn_evaluate_skill"):
                 with st.spinner("Scoring..."):
-                    score = st.session_state.agents["scorer"].evaluate_skill(current_skill.skill_name, history)
+                    score = agents_pool["scorer"].evaluate_skill(current_skill.skill_name, history)
                     st.session_state.actual_scores.append(score)
                     
                     if st.session_state.current_skill_index < len(st.session_state.jd_skills) - 1:
