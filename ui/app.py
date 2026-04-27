@@ -1,7 +1,12 @@
 import streamlit as st
 import os
 import time
+import sys
 from dotenv import load_dotenv
+
+# Ensure we have utils.ai_structured registered early in sys.modules 
+# to avoid Pydantic KeyError during hot-reloads
+import utils.ai_structured 
 
 # Ensure we load env before imports
 load_dotenv()
