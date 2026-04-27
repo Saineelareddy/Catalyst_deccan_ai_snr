@@ -4,6 +4,9 @@ import time
 import sys
 from dotenv import load_dotenv
 
+# MUST BE THE FIRST STREAMLIT CALL
+st.set_page_config(page_title="AI Skill Assessment", layout="wide")
+
 # Ensure we have utils.ai_structured registered early in sys.modules 
 # to avoid Pydantic KeyError during hot-reloads
 import utils.ai_structured 
@@ -16,7 +19,6 @@ from agents.parser_agent import ParserAgent
 from agents.skill_extractor import SkillExtractorAgent
 from agents.assessment_agent import AssessmentAgent
 from agents.scoring_agent import ScoringAgent
-from agents.gap_analysis_agent import GapAnalysisAgent
 from agents.gap_analysis_agent import GapAnalysisAgent
 from agents.learning_plan_agent import LearningPlanAgent
 from ui.dashboard import render_results_dashboard
@@ -36,8 +38,11 @@ key_manager.refresh_keys("groq")
 
 # Load custom CSS
 def local_css(file_name):
-    with open(file_name) as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    try:
+        with open(file_name) as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.error(f"CSS file not found: {file_name}")
 
 local_css("ui/style.css")
 
@@ -52,9 +57,13 @@ def get_agents():
         "planner": LearningPlanAgent()
     }
 
-agents = get_agents()
+try:
+    agents = get_agents()
+except Exception as e:
+    st.error(f"Failed to initialize agents: {e}")
+    st.exception(e)
+    st.stop()
 
-st.set_page_config(page_title="AI Skill Assessment", layout="wide")
 st.title("AI-Powered Skill Assessment & Learning Plan")
 
 # State Management
