@@ -46,7 +46,7 @@ def local_css(file_name):
 
 local_css("ui/style.css")
 
-@st.cache_resource
+# Initialize agents
 def get_agents():
     try:
         return {
@@ -61,7 +61,10 @@ def get_agents():
         st.error(f"Critical Error: Failed to initialize AI Agents. {e}")
         return None
 
-agents = get_agents()
+if "agents" not in st.session_state:
+    st.session_state.agents = get_agents()
+
+agents = st.session_state.agents
 
 if not agents:
     st.warning("⚠️ The AI system could not be initialized. Please check your API keys in the settings.")
@@ -131,8 +134,8 @@ if st.session_state.processing_phase:
     # Perform the actual work while the gears spin
     if phase == "setup_to_assessment":
         # 1. Parse Resume & Skills
-        st.session_state.parsed_resume = agents["parser"].parse_resume(st.session_state.temp_resume_text)
-        st.session_state.jd_skills = agents["extractor"].extract_skills(st.session_state.temp_jd_text).skills
+        st.session_state.parsed_resume = st.session_state.agents["parser"].parse_resume(st.session_state.temp_resume_text)
+        st.session_state.jd_skills = st.session_state.agents["extractor"].extract_skills(st.session_state.temp_jd_text).skills
         
         # 2. Init Chat
         st.session_state.chat_history = {}
@@ -151,12 +154,12 @@ if st.session_state.processing_phase:
         
     elif phase == "assessment_to_plan":
         # Final Scoring & Planning
-        gaps = agents["analyzer"].analyze_gaps(st.session_state.jd_skills, st.session_state.actual_scores)
+        gaps = st.session_state.agents["analyzer"].analyze_gaps(st.session_state.jd_skills, st.session_state.actual_scores)
         name = getattr(st.session_state.parsed_resume, "name", "Candidate") or "Candidate"
         
         # Parallel Racing in background
         import asyncio
-        st.session_state.learning_plan = asyncio.run(agents["planner"].agenerate_plan(gaps, candidate_name=name))
+        st.session_state.learning_plan = asyncio.run(st.session_state.agents["planner"].agenerate_plan(gaps, candidate_name=name))
         
         time.sleep(1) # Small buffer
         st.session_state.processing_phase = None
@@ -249,7 +252,7 @@ elif st.session_state.current_step == 1:
                 
                 def get_stream():
                     # Helper to run async gen in sync streamlit
-                    gen = agents["assessor"].astream_question(
+                    gen = st.session_state.agents["assessor"].astream_question(
                         current_skill.skill_name, 
                         current_skill.required_proficiency, 
                         str(st.session_state.parsed_resume.experience), 
@@ -287,7 +290,7 @@ elif st.session_state.current_step == 1:
         if len(history) >= 2: # At least one Q&A pair
             if c_next.button("Finish this Skill & Evaluate", key="btn_evaluate_skill"):
                 with st.spinner("Scoring..."):
-                    score = agents["scorer"].evaluate_skill(current_skill.skill_name, history)
+                    score = st.session_state.agents["scorer"].evaluate_skill(current_skill.skill_name, history)
                     st.session_state.actual_scores.append(score)
                     
                     if st.session_state.current_skill_index < len(st.session_state.jd_skills) - 1:
