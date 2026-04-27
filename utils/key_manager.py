@@ -50,8 +50,10 @@ class KeyManager:
         now = time.time()
         available = [k for k in self.keys[provider] if k["cooldown_until"] <= now]
         
-        # If all keys are in cooldown, just take the one that expires soonest
         if not available:
+            if not self.keys[provider]:
+                logger.error(f"No keys loaded for {provider}.")
+                return []
             logger.warning(f"All {provider} keys are in cooldown. Forcing use of soonest available.")
             available = sorted(self.keys[provider], key=lambda x: x["cooldown_until"])
             
